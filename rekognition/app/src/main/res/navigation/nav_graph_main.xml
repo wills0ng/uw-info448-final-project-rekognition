@@ -4,12 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/HomeFragment"
+    app:startDestination="@id/MainFragment"
     >
     <fragment
-        android:id="@+id/HomeFragment"
-        android:label="@string/label_home"
-        android:name="edu.uw.minh2804.rekognition.HomeFragment"
-        tools:layout="@layout/fragment_home"
+        android:id="@+id/MainFragment"
+        android:label="@string/main_label"
+        android:name="edu.uw.minh2804.rekognition.MainFragment"
+        tools:layout="@layout/fragment_main"
         />
 </navigation>

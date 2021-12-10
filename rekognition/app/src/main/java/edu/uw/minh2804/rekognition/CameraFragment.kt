@@ -6,12 +6,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,8 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlinx.android.synthetic.main.fragment_camera.*
 
+// 90% of this CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var imageCapture: ImageCapture? = null
 
@@ -39,7 +41,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         // Set up the listener for take photo button
-        camera_capture_button.setOnClickListener { takePhoto() }
+        view.findViewById<Button>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
 
         outputDirectory = getOutputDirectory()
 
@@ -87,7 +89,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(view_finder.surfaceProvider)
+                    it.setSurfaceProvider(requireView().findViewById<PreviewView>(R.id.preview_camera_finder).surfaceProvider)
                 }
 
             imageCapture = ImageCapture.Builder()
