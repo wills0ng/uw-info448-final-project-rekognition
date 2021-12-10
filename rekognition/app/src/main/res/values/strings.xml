@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Rekognition</string>
+    <string name="button_take_photo">Take Photo</string>
+    <string name="button_to_camera">To Camera</string>
+    <string name="label_camera">Camera</string>
+    <string name="label_home">Home</string>
 </resources>

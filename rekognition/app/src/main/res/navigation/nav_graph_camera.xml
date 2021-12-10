@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/CameraFragment"
+    >
+    <fragment
+        android:id="@+id/CameraFragment"
+        android:label="@string/label_camera"
+        android:name="edu.uw.minh2804.rekognition.CameraFragment"
+        tools:layout="@layout/fragment_camera"
+        />
+</navigation>
