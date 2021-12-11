@@ -6,7 +6,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,10 +20,14 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.services.OnTextProcessedCallback
 import edu.uw.minh2804.rekognition.services.TextRecognitionService
 import java.io.File
+import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -36,6 +39,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var auth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,6 +53,22 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // Sign the user in anonymously
+        auth = Firebase.auth
+        auth.signInAnonymously()
+            .addOnCompleteListener { task ->
+                Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful)
+
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "signInWithCredential", task.exception)
+                    Toast.makeText(this.context, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     override fun onDestroy() {
