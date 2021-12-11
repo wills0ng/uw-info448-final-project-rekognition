@@ -55,7 +55,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.google.firebase:firebase-bom:29.0.1'
+    // Using the BoM's automatic versioning doesn't seem to work with auth-ktx TODO: remove commented implementation
+//    implementation 'com.google.firebase:firebase-bom:29.0.1'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
     implementation 'com.google.firebase:firebase-functions:20.0.1'
     implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

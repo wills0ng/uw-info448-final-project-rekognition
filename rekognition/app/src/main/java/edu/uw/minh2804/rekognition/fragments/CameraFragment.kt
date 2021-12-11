@@ -4,6 +4,8 @@ package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -11,17 +13,20 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import edu.uw.minh2804.rekognition.R
+import edu.uw.minh2804.rekognition.services.OnTextProcessedCallback
+import edu.uw.minh2804.rekognition.services.TextRecognitionService
 import java.io.File
+import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -33,6 +38,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var auth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,6 +63,22 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         outputDirectory = getOutputDirectory()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // Sign the user in anonymously
+        auth = Firebase.auth
+        auth.signInAnonymously()
+            .addOnCompleteListener { task ->
+                Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful)
+
+                // If sign in fails, display a message to the user. If sign in succeeds
+                // the auth state listener will be notified and logic to handle the
+                // signed in user can be handled in the listener.
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "signInWithCredential", task.exception)
+                    Toast.makeText(this.context, "Authentication failed.",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun takePhoto() {
@@ -88,6 +110,43 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     Log.d(TAG, msg)
                 }
             })
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        imageCapture.takePicture(cameraExecutor, object :
+            ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                Log.v(TAG, "Got an image")
+                //get bitmap from image
+                val bitmap = imageProxyToBitmap(image)
+                Log.v(TAG, "Got a bitmap: $bitmap")
+                TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
+                    override fun onProcessed(string: String) {
+                        Log.v(TAG, string)
+                    }
+
+                    override fun onError(e: Exception) {
+                        e.message?.let { Log.e(TAG, it) }
+                    }
+
+                })
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                exception.message?.let { Log.e(TAG, it) }
+            }
+        })
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    }
+
+    /**
+     *  convert image proxy to bitmap
+     *  @param image
+     */
+    private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+        val planeProxy = image.planes[0]
+        val buffer: ByteBuffer = planeProxy.buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
     private fun startCamera() {
