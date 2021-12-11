@@ -40,16 +40,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Request camera permissions
         if (isPermissionsGranted()) {
             startCamera()
         } else {
             requestPermissions()
         }
 
-        // Set up the listener for take photo button
         view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
-
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
@@ -83,7 +80,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                             override fun onError(e: Exception) {
                                 Log.e(TAG, "Photo processed failed: ${e.message}", e)
                             }
-
                         })
                     }
 
@@ -129,14 +125,16 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun requestPermissions() {
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                startCamera()
-            } else {
-                Toast.makeText(requireActivity(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
-                requireActivity().finish()
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.forEach { (_, isGranted) ->
+                if (isGranted) {
+                    startCamera()
+                } else {
+                    Toast.makeText(requireActivity(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
+                    requireActivity().finish()
+                }
             }
-        } .run { launch(Manifest.permission.CAMERA) }
+        } .run { launch(REQUIRED_PERMISSIONS) }
     }
 
     private fun getOutputDirectory(): File {
