@@ -3,7 +3,10 @@ package edu.uw.minh2804.rekognition.services
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tasks.Task
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import com.google.gson.*
+import edu.uw.minh2804.rekognition.extensions.toString64
 
 // @Tom - If we don't use more than one property from the TextAnnotation response object, then why don't we just return the string itself?
 // If you think we should use this TextAnnotation class, then uncomment the commented code in this file.
@@ -14,72 +17,70 @@ import com.google.gson.*
 //    val text: String
 //)
 
+private val FUNCTIONS = Firebase.functions
+private val FUNCTION_NAME = "annotateImage"
+
 interface OnTextProcessedCallback {
     // TODO: remove commented code
-//    fun onProcessed(textAnnotation: TextAnnotation)
+    // fun onProcessed(textAnnotation: TextAnnotation)
     fun onProcessed(string: String)
     fun onError(e: Exception)
 }
 
 // This object is a modification of the code from the firebase docs: https://firebase.google.com/docs/ml/android/recognize-text?authuser=0#1.-prepare-the-input-image
-object TextRecognitionService : GoogleVisionService() {
+object TextRecognitionService {
     private const val TAG = "TextRecognitionService"
 
     fun processImage(image: Bitmap, callback: OnTextProcessedCallback) {
-        // Get base64 string representation of the image
-        val base64encoded = bitmapToString(image)
-
-        // Create request from image string
-        val request = createRequest(base64encoded)
-
-        annotateImage(request.toString())
-            .addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.e(TAG, "Task unsuccessful")
-                    callback.onError(task.exception!!)
-                } else {
-                    Log.v(TAG, "Successful response $task")
-                    val annotation = task.result!!.asJsonArray[0].asJsonObject["fullTextAnnotation"].asJsonObject
-                    Log.v(TAG, "Annotation: $annotation")
-                    // TODO: remove commented code
-//                    callback.onProcessed(TextAnnotation(annotation["text"].asString))
-                    callback.onProcessed(annotation["text"].asString)
-                }
+        if (!FirebaseAuthService.isSignedIn()) {
+            callback.onError(Exception(UNAUTHORIZED_EXCEPTION))
+            return
+        }
+        val request = createRequest(image.toString64())
+        annotateImage(request.toString()).addOnCompleteListener { response ->
+            if (response.isSuccessful) {
+                Log.v(TAG, "Successful response $response")
+                val annotation = response.result!!.asJsonArray[0].asJsonObject["fullTextAnnotation"].asJsonObject
+                Log.v(TAG, "Annotation: $annotation")
+                // TODO: remove commented code
+                // callback.onProcessed(TextAnnotation(annotation["text"].asString))
+                callback.onProcessed(annotation["text"].asString)
+            } else {
+                Log.e(TAG, "Task unsuccessful")
+                callback.onError(response.exception!!)
             }
+        }
     }
 
     private fun annotateImage(requestJson: String): Task<JsonElement> {
-        return functions
-            .getHttpsCallable("annotateImage")
+        return FUNCTIONS
+            .getHttpsCallable(FUNCTION_NAME)
             .call(requestJson)
-            .continueWith { task ->
+            .continueWith { response ->
                 // This continuation runs on either success or failure, but if the task
                 // has failed then result will throw an Exception which will be
                 // propagated down.
-                val result = task.result?.data
+                val result = response.result?.data
                 JsonParser.parseString(Gson().toJson(result))
             }
     }
 
     private fun createRequest(base64encoded: String): JsonObject {
-        // Create json request to cloud vision
-        val request = JsonObject()
-        // Add image to request
-        val reqImage = JsonObject()
-        reqImage.add("content", JsonPrimitive(base64encoded))
-        request.add("image", reqImage)
-        //Add features to the request
-        val feature = JsonObject()
-        feature.add("type", JsonPrimitive("TEXT_DETECTION"))
-        val features = JsonArray()
-        features.add(feature)
-        request.add("features", features)
-        // Add language hints TODO: remove language hints if user's language isn't english?
-        val imageContext = JsonObject()
-        val languageHints = JsonArray()
-        languageHints.add("en")
-        imageContext.add("languageHints", languageHints)
-        request.add("imageContext", imageContext)
+        val request = JsonObject().apply {
+            val image = JsonObject().apply { add("content", JsonPrimitive(base64encoded)) }
+            add("image", image)
+
+            val feature = JsonObject().apply { add("type", JsonPrimitive("TEXT_DETECTION")) }
+            val features = JsonArray().apply { add(feature) }
+            add("features", features)
+
+            val imageContext = JsonObject().apply {
+                val languageHints = JsonArray().apply { add("en") }
+                add("languageHints", languageHints)
+            }
+
+            add("imageContext", imageContext)
+        }
         return request
     }
 }

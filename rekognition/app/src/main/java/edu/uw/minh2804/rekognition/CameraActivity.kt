@@ -11,18 +11,24 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                Log.v("CameraActivity", tab!!.text.toString())
-            }
+        findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    Log.v(TAG, tab!!.text.toString())
+                }
 
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                Log.v("CameraActivity", tab!!.text.toString())
-            }
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                    Log.v(TAG, tab!!.text.toString())
+                }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                Log.v("CameraActivity", tab!!.text.toString())
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                    Log.v(TAG, tab!!.text.toString())
+                }
             }
-        })
+        )
+    }
+
+    private companion object {
+        const val TAG = "CameraActivity"
     }
 }

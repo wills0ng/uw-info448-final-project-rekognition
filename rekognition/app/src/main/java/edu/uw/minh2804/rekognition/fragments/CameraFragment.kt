@@ -4,11 +4,9 @@ package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -17,17 +15,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import edu.uw.minh2804.rekognition.R
+import edu.uw.minh2804.rekognition.services.FirebaseAuthService
 import edu.uw.minh2804.rekognition.services.OnTextProcessedCallback
 import edu.uw.minh2804.rekognition.services.TextRecognitionService
 import java.io.File
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -39,10 +33,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var auth: FirebaseAuth
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (!FirebaseAuthService.isSignedIn()) {
+            FirebaseAuthService.signIn()
+        }
 
         if (isPermissionsGranted()) {
             startCamera()
@@ -51,24 +48,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
+
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        // Sign the user in anonymously
-        auth = Firebase.auth
-        auth.signInAnonymously()
-            .addOnCompleteListener { task ->
-                Log.d(TAG, "signInAnonymously:onComplete:" + task.isSuccessful)
-
-                // If sign in fails, display a message to the user. If sign in succeeds
-                // the auth state listener will be notified and logic to handle the
-                // signed in user can be handled in the listener.
-                if (!task.isSuccessful) {
-                    Log.w(TAG, "signInWithCredential", task.exception)
-                    Toast.makeText(this.context, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
     }
 
     override fun onDestroy() {
@@ -77,38 +59,37 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun takePhoto() {
-        imageCapture?.let {
-            val photoFileToOutput = File(
-                outputDirectory,
-                SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
-            )
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFileToOutput).build()
-
-            it.takePicture(
-                outputOptions,
-                ContextCompat.getMainExecutor(requireContext()),
-                object : ImageCapture.OnImageSavedCallback {
-                    override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                        val savedUri = Uri.fromFile(photoFileToOutput)
-                        val bitmap = BitmapFactory.decodeFile(savedUri.path)
-
-                        TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
-                            override fun onProcessed(string: String) {
-                                Log.v(TAG, string);
-                            }
-
-                            override fun onError(e: Exception) {
-                                Log.e(TAG, "Photo processed failed: ${e.message}", e)
-                            }
-                        })
-                    }
-
-                    override fun onError(e: ImageCaptureException) {
-                        Log.e(TAG, "Photo save failed: ${e.message}", e)
-                    }
-                }
-            )
+        if (imageCapture == null || !FirebaseAuthService.isSignedIn()) {
+            return
         }
+
+        val outputFile = createUniqueOutputFile()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
+
+        imageCapture!!.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val savedUri = Uri.fromFile(outputFile)
+                    val bitmap = BitmapFactory.decodeFile(savedUri.path)
+
+                    TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
+                        override fun onProcessed(string: String) {
+                            Log.v(TAG, string);
+                        }
+
+                        override fun onError(e: Exception) {
+                            Log.e(TAG, "Photo processed failed: ${e.message}", e)
+                        }
+                    })
+                }
+
+                override fun onError(e: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${e.message}", e)
+                }
+            }
+        )
     }
 
     private fun startCamera() {
@@ -163,6 +144,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
         return if (mediaDir != null && mediaDir.exists()) mediaDir else requireActivity().filesDir
     }
+    private fun createUniqueOutputFile(): File = File(
+        outputDirectory,
+        SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
+    )
 
     private companion object {
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

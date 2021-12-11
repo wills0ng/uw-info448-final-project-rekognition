@@ -10,11 +10,13 @@ data class ObjectAnnotation(
 
 interface OnObjectProcessedCallback {
     fun onProcessed(objectAnnotation: ObjectAnnotation)
-    fun onError(e: Exception)
+    fun onError(exception: Exception)
 }
 
 object ObjectRecognitionService {
-    fun processImage(image: Bitmap, onObjectProcessedCallback: OnObjectProcessedCallback) {
+    private const val TAG = "ObjectRecognitionService"
+
+    fun processImage(image: Bitmap, callback: OnObjectProcessedCallback) {
         // Implementation here
     }
 }
