@@ -1,6 +1,6 @@
 /** Tom Nguyen: I wrote this class and it's corresponding xml files. **/
 
-package edu.uw.minh2804.rekognition
+package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -19,6 +19,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import edu.uw.minh2804.rekognition.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -57,7 +58,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         // Create time-stamped output file to hold the image
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(FILENAME_FORMAT, Locale.US
+            SimpleDateFormat(
+                FILENAME_FORMAT, Locale.US
             ).format(System.currentTimeMillis()) + ".jpg")
 
         // Create output options object which contains file + metadata

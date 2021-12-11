@@ -5,7 +5,7 @@
     android:background="@color/black_65"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    tools:context=".OutputFragment"
+    tools:context=".fragments.OutputFragment"
     >
     <TextView
         android:id="@+id/text_output_overlay"

@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/CameraFragment"
         android:label="@string/camera_label"
-        android:name="edu.uw.minh2804.rekognition.CameraFragment"
+        android:name="edu.uw.minh2804.rekognition.fragments.CameraFragment"
         tools:layout="@layout/fragment_camera"
         />
 </navigation>

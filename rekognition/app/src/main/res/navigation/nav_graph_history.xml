@@ -9,7 +9,7 @@
     <fragment
         android:id="@+id/HistoryFragment"
         android:label="@string/camera_label"
-        android:name="edu.uw.minh2804.rekognition.HistoryFragment"
+        android:name="edu.uw.minh2804.rekognition.fragments.HistoryFragment"
         tools:layout="@layout/fragment_history"
         />
 </navigation>
