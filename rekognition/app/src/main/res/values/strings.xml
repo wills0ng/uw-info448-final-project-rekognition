@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Rekognition</string>
+    <string name="camera_image_labeling">Object</string>
     <string name="camera_label">Camera</string>
     <string name="camera_take_photo">Take Photo</string>
+    <string name="camera_text_recognition">Text</string>
     <string name="history_label">History</string>
     <string name="main_label">Home</string>
     <string name="main_to_camera">To Camera</string>

@@ -7,21 +7,30 @@
     android:layout_width="match_parent"
     tools:context=".CameraFragment"
     >
-    <Button
-        android:id="@+id/button_camera_capture"
-        android:elevation="2dp"
-        android:layout_height="100dp"
-        android:layout_marginBottom="50dp"
-        android:layout_width="100dp"
-        android:scaleType="fitCenter"
-        android:text="@string/camera_take_photo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
     <androidx.camera.view.PreviewView
         android:id="@+id/preview_camera_finder"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_output"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:name="edu.uw.minh2804.rekognition.OutputFragment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <ImageButton
+        android:id="@+id/button_camera_capture"
+        android:background="@drawable/ic_baseline_camera_24"
+        android:elevation="2dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="30dp"
+        android:layout_width="70dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

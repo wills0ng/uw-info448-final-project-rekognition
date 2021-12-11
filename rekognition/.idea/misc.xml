@@ -4,6 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Tom/AndroidStudioProjects/group-final-project-a6-rekognition/rekognition/app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.5703125" />
+        <entry key="..\:/Users/Tom/AndroidStudioProjects/group-final-project-a6-rekognition/rekognition/app/src/main/res/layout/activity_camera.xml" value="0.4157608695652174" />
+        <entry key="..\:/Users/Tom/AndroidStudioProjects/group-final-project-a6-rekognition/rekognition/app/src/main/res/layout/activity_history.xml" value="0.49094202898550726" />
+        <entry key="..\:/Users/Tom/AndroidStudioProjects/group-final-project-a6-rekognition/rekognition/app/src/main/res/layout/fragment_camera.xml" value="0.4157608695652174" />
+        <entry key="..\:/Users/Tom/AndroidStudioProjects/group-final-project-a6-rekognition/rekognition/app/src/main/res/layout/fragment_output.xml" value="0.4157608695652174" />
       </map>
     </option>
   </component>

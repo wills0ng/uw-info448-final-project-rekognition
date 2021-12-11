@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this class and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition
 
 import android.Manifest
@@ -6,7 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -23,7 +25,7 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-// 90% of this CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
+// 80% of this CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var imageCapture: ImageCapture? = null
 
@@ -41,7 +43,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         // Set up the listener for take photo button
-        view.findViewById<Button>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
+        view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
 
         outputDirectory = getOutputDirectory()
 
