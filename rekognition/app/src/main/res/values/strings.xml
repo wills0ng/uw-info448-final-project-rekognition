@@ -7,4 +7,5 @@
     <string name="history_label">History</string>
     <string name="main_label">Home</string>
     <string name="main_to_camera">To Camera</string>
+    <string name="main_to_history">To History</string>
 </resources>

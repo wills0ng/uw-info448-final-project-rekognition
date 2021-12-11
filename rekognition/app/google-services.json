@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "721510630547",
+    "project_id": "rekognition-3d49c",
+    "storage_bucket": "rekognition-3d49c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:721510630547:android:1263d5e025159b58573966",
+        "android_client_info": {
+          "package_name": "edu.uw.minh2804.rekognition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "721510630547-3pcfil37ene6ectgemc2rh8qm9a8pjtr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAZoWkgFJXs7UREuCgxaJrpjyWFR9oyxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "721510630547-3pcfil37ene6ectgemc2rh8qm9a8pjtr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
