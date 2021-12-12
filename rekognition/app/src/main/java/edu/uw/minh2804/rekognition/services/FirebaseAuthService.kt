@@ -5,8 +5,8 @@ import com.google.firebase.ktx.Firebase
 import java.lang.Exception
 
 interface OnSignedInCallback {
-    fun onSignedIn()
-    fun onError(exception: Exception)
+    fun onSignedIn() {}
+    fun onError(exception: Exception) {}
 }
 
 object FirebaseAuthService {
