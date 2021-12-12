@@ -3,15 +3,13 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -25,6 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
@@ -47,10 +47,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         if (isPermissionsGranted()) {
-            Log.v(TAG, "is granted")
             startCamera()
         } else {
-            Log.v(TAG, "no granted")
             requestPermissions()
         }
 
@@ -73,6 +71,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         val outputFile = createUniqueOutputFile()
         val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
 
+        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay)
+        textView.text = "Processing..."
+        textView.visibility = View.VISIBLE
+
         imageCapture!!.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
@@ -83,15 +85,40 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
                         override fun onResultFound(annotation: TextAnnotation) {
-                            Log.v(TAG, annotation.text);
+                            textView.text = annotation.text
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
+                            }
                         }
 
                         override fun onResultNotFound() {
-                            Log.v(TAG, "Result not found");
+                            textView.text = "No text detected"
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
+                            }
                         }
 
                         override fun onError(exception: Exception) {
                             Log.e(TAG, "Photo processed failed: ${exception.message}", exception)
+                            textView.text = "Something went wrong, please try again later."
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
+                            }
                         }
                     })
                 }
