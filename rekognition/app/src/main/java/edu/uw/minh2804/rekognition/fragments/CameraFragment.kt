@@ -38,7 +38,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         super.onViewCreated(view, savedInstanceState)
 
         if (!FirebaseAuthService.isSignedIn()) {
-            FirebaseAuthService.signIn()
+            FirebaseAuthService.signIn() //TODO: add callback to log failure
         }
 
         if (isPermissionsGranted()) {
