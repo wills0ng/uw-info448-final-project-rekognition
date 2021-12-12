@@ -9,7 +9,8 @@ data class ObjectAnnotation(
 )
 
 interface OnObjectProcessedCallback {
-    fun onProcessed(annotation: ObjectAnnotation)
+    fun onResultFound(annotation: ObjectAnnotation)
+    fun onResultNotFound()
     fun onError(exception: Exception)
 }
 

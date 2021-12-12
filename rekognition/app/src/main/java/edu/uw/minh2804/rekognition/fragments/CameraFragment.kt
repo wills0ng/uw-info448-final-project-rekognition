@@ -28,6 +28,10 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+private const val TAG = "CameraFragment"
+private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.INTERNET)
+
 // CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var imageCapture: ImageCapture? = null
@@ -77,8 +81,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     val bitmap = BitmapFactory.decodeFile(savedUri.path)
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
-                        override fun onProcessed(annotation: TextAnnotation) {
+                        override fun onResultFound(annotation: TextAnnotation) {
                             Log.v(TAG, annotation.text);
+                        }
+
+                        override fun onResultNotFound() {
+                            Log.v(TAG, "Result not found");
                         }
 
                         override fun onError(exception: Exception) {
@@ -87,8 +95,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     })
                 }
 
-                override fun onError(e: ImageCaptureException) {
-                    Log.e(TAG, "Photo save failed: ${e.message}", e)
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${exception.message}", exception)
                 }
             }
         )
@@ -150,10 +158,4 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         outputDirectory,
         SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
     )
-
-    private companion object {
-        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        const val TAG = "CameraFragment"
-        val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.INTERNET)
-    }
 }

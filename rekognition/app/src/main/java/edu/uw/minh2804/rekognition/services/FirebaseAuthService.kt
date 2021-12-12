@@ -4,8 +4,6 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.lang.Exception
 
-val UNAUTHORIZED_EXCEPTION = Exception("User is not signed into Firebase")
-
 interface OnSignedInCallback {
     fun onSignedIn()
     fun onError(exception: Exception)
@@ -13,6 +11,8 @@ interface OnSignedInCallback {
 
 object FirebaseAuthService {
     private const val TAG = "FirebaseAuthService"
+
+    val UNAUTHORIZED_EXCEPTION = Exception("User is not signed into Firebase")
 
     fun signIn() {
         Firebase.auth.signInAnonymously()
