@@ -3,15 +3,13 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -25,6 +23,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
@@ -47,10 +47,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         if (isPermissionsGranted()) {
-            Log.v(TAG, "is granted")
             startCamera()
         } else {
-            Log.v(TAG, "no granted")
             requestPermissions()
         }
 
@@ -83,11 +81,26 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
                         override fun onResultFound(annotation: TextAnnotation) {
-                            Log.v(TAG, annotation.text);
+                            requireView().findViewById<TextView>(R.id.text_output_overlay).apply {
+                                text = annotation.text
+                                visibility = View.VISIBLE
+                            }
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.let { it.findViewById<TextView>(R.id.text_output_overlay).visibility = View.INVISIBLE }
+                            }
                         }
 
                         override fun onResultNotFound() {
-                            Log.v(TAG, "Result not found");
+                            Log.v(TAG, "tttt")
+                            requireView().findViewById<TextView>(R.id.text_output_overlay).apply {
+                                text = "No text detected"
+                                visibility = View.VISIBLE
+                            }
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.let { it.findViewById<TextView>(R.id.text_output_overlay).visibility = View.INVISIBLE }
+                            }
                         }
 
                         override fun onError(exception: Exception) {
