@@ -18,9 +18,7 @@ private const val RESPONSE_KEY = "fullTextAnnotation"
 private val FUNCTIONS = Firebase.functions
 
 interface OnTextProcessedCallback {
-    // TODO: remove commented code
-    // fun onProcessed(textAnnotation: TextAnnotation)
-    fun onProcessed(string: TextAnnotation)
+    fun onProcessed(annotation: TextAnnotation)
     fun onError(exception: Exception)
 }
 
