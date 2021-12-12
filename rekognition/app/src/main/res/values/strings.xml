@@ -1,11 +1,11 @@
-<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!-- I learned about these file-level constants from https://stackoverflow.com/questions/4746058/reference-one-string-from-another-string-in-strings-xml -->
 <!DOCTYPE resources [
     <!ENTITY appname "Rekognition">
     <!ENTITY image_labeling "Object">
     ]>
 
-<resources>
-    <string name="app_name">&appname;</string>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name" translatable="false">&appname;</string>
     <string name="camera_image_labeling">&image_labeling;</string>
     <string name="camera_label">Camera</string>
     <string name="camera_take_photo">Take Photo</string>
@@ -14,7 +14,7 @@
     <string name="main_label">Home</string>
     <string name="main_to_camera">Get Started</string>
     <string name="main_to_history">To History</string>
-    <string name="text_detection_explanation">With &appname;, you can use your phone to read the words around you. Just point at what you think has words on it, and take a picture. We’ll take care of the rest.</string>
+    <string name="text_detection_explanation">With <xliff:g id="appname">&appname;</xliff:g>, you can use your phone to read the words around you. Just point at what you think has words on it, and take a picture. We’ll take care of the rest.</string>
     <string name="object_detection_explanation">If you want us to tell you what something is instead, then you can go to the \'&image_labeling;\' tab and then take a picture of the object.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
