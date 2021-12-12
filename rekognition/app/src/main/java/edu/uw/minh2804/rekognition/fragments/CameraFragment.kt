@@ -92,7 +92,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                         }
 
                         override fun onResultNotFound() {
-                            Log.v(TAG, "tttt")
                             requireView().findViewById<TextView>(R.id.text_output_overlay).apply {
                                 text = "No text detected"
                                 visibility = View.VISIBLE
