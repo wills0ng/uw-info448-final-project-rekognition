@@ -28,7 +28,7 @@ fun Bitmap.scaleDown(maxDimension: Int): Bitmap {
 
 fun Bitmap.toString64(): String {
     val stream = ByteArrayOutputStream().also {
-        this.scaleDown(640).compress(Bitmap.CompressFormat.JPEG, 100, it)
+        this.compress(Bitmap.CompressFormat.JPEG, 100, it)
     }
     return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP)
 }

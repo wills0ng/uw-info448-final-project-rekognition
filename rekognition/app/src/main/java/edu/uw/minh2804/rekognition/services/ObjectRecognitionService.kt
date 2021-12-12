@@ -1,12 +1,7 @@
 package edu.uw.minh2804.rekognition.services
 
 import android.graphics.Bitmap
-import com.google.android.gms.tasks.Task
-import com.google.firebase.functions.ktx.functions
-import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
-import com.google.gson.JsonElement
-import com.google.gson.JsonParser
+import edu.uw.minh2804.rekognition.extensions.scaleDown
 import edu.uw.minh2804.rekognition.extensions.toString64
 
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#EntityAnnotation
@@ -15,11 +10,7 @@ data class ObjectAnnotation(
     val score: Double
 )
 
-interface OnObjectProcessedCallback {
-    fun onResultFound(annotation: ObjectAnnotation)
-    fun onResultNotFound()
-    fun onError(exception: Exception)
-}
+interface OnObjectProcessedCallback : RecognitionServiceCallback<ObjectAnnotation>
 
 object ObjectRecognitionService {
     private const val TAG = "ObjectRecognitionService"
@@ -29,9 +20,11 @@ object ObjectRecognitionService {
             callback.onError(FirebaseAuthService.UNAUTHORIZED_EXCEPTION)
             return
         }
-        val request = ObjectRecognitionRequest.createRequest(image.toString64())
+        val request = ObjectRecognitionRequest.createRequest(image.scaleDown(ImageRecognitionSetting.MAX_DIMENSION).toString64())
+        val response = FirebaseFunctionsService.callFunction("labelImage", request)
+
         // responses and labelAnnotations will each be a single-element array in our case
-        labelImage(request.toString()).addOnSuccessListener { responses ->
+        response.addOnSuccessListener { responses ->
             val labelAnnotations = responses.asJsonArray[0].asJsonObject["labelAnnotations"]
             if (labelAnnotations != null) {
                 val label = labelAnnotations.asJsonArray[0].asJsonObject
@@ -41,16 +34,9 @@ object ObjectRecognitionService {
             } else {
                 callback.onResultNotFound()
             }
-        } .addOnFailureListener {
+        }
+        response.addOnFailureListener {
             callback.onError(it)
         }
-    }
-
-    private fun labelImage(requestJson: String): Task<JsonElement> {
-        return Firebase
-            .functions
-            .getHttpsCallable("annotateImage")
-            .call(requestJson)
-            .continueWith { JsonParser.parseString(Gson().toJson(it.result?.data)) }
     }
 }

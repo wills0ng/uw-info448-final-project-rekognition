@@ -1,5 +1,3 @@
-/** Tom Nguyen: I wrote this class and it's corresponding xml files. **/
-
 package edu.uw.minh2804.rekognition
 
 import android.os.Bundle
@@ -7,12 +5,9 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 
-private const val TAG = "CameraActivity"
-
 class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -28,5 +23,9 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
                 }
             }
         )
+    }
+
+    companion object {
+        private const val TAG = "CameraActivity"
     }
 }

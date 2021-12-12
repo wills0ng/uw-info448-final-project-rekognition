@@ -12,12 +12,11 @@ object TextRecognitionRequest {
     private val imageContext = JsonObject().also { it.add("languageHints", languageHints) }
 
     fun createRequest(base64encoded: String): JsonObject {
-        val request = JsonObject().also { request ->
+        return JsonObject().also { request ->
             val image = JsonObject().also { it.add("content", JsonPrimitive(base64encoded)) }
             request.add("image", image)
             request.add("features", features)
             request.add("imageContext", imageContext)
         }
-        return request
     }
 }

@@ -10,21 +10,20 @@ interface OnSignedInCallback {
 }
 
 object FirebaseAuthService {
-    private const val TAG = "FirebaseAuthService"
-
+    private val AUTH = Firebase.auth
     val UNAUTHORIZED_EXCEPTION = Exception("User is not signed into Firebase")
 
     fun signIn() {
-        Firebase.auth.signInAnonymously()
+        AUTH.signInAnonymously()
     }
 
     fun signIn(callback: OnSignedInCallback) {
-        Firebase.auth.signInAnonymously()
+        AUTH.signInAnonymously()
             .addOnSuccessListener { callback.onSignedIn() }
             .addOnFailureListener { callback.onError(it) }
     }
 
     fun isSignedIn(): Boolean {
-        return Firebase.auth.currentUser != null
+        return AUTH.currentUser != null
     }
 }
