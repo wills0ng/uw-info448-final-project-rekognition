@@ -71,6 +71,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         val outputFile = createUniqueOutputFile()
         val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
 
+        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay)
+        textView.text = "Processing..."
+        textView.visibility = View.VISIBLE
+
         imageCapture!!.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
@@ -81,29 +85,40 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
                         override fun onResultFound(annotation: TextAnnotation) {
-                            requireView().findViewById<TextView>(R.id.text_output_overlay).apply {
-                                text = annotation.text
-                                visibility = View.VISIBLE
-                            }
+                            textView.text = annotation.text
                             GlobalScope.launch {
                                 Thread.sleep(1000 * 5)
-                                view?.let { it.findViewById<TextView>(R.id.text_output_overlay).visibility = View.INVISIBLE }
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
                             }
                         }
 
                         override fun onResultNotFound() {
-                            requireView().findViewById<TextView>(R.id.text_output_overlay).apply {
-                                text = "No text detected"
-                                visibility = View.VISIBLE
-                            }
+                            textView.text = "No text detected"
                             GlobalScope.launch {
                                 Thread.sleep(1000 * 5)
-                                view?.let { it.findViewById<TextView>(R.id.text_output_overlay).visibility = View.INVISIBLE }
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
                             }
                         }
 
                         override fun onError(exception: Exception) {
                             Log.e(TAG, "Photo processed failed: ${exception.message}", exception)
+                            textView.text = "Something went wrong, please try again later."
+                            GlobalScope.launch {
+                                Thread.sleep(1000 * 5)
+                                view?.findViewById<TextView>(R.id.text_output_overlay)?.let {
+                                    if (it.text != "Processing...") {
+                                        it.visibility = View.INVISIBLE
+                                    }
+                                }
+                            }
                         }
                     })
                 }
