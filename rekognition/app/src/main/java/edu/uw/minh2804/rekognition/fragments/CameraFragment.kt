@@ -77,7 +77,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
                         override fun onProcessed(string: String) {
-                            Log.v(TAG, string);
+                            Log.v(TAG, string)
                         }
 
                         override fun onError(e: Exception) {
