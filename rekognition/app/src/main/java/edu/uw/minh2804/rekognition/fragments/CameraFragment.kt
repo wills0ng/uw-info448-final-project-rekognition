@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.services.FirebaseAuthService
 import edu.uw.minh2804.rekognition.services.OnTextProcessedCallback
+import edu.uw.minh2804.rekognition.services.TextAnnotation
 import edu.uw.minh2804.rekognition.services.TextRecognitionService
 import java.io.File
 import java.text.SimpleDateFormat
@@ -76,12 +77,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     val bitmap = BitmapFactory.decodeFile(savedUri.path)
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
-                        override fun onProcessed(string: String) {
-                            Log.v(TAG, string)
+                        override fun onProcessed(annotation: TextAnnotation) {
+                            Log.v(TAG, annotation.text)
                         }
 
-                        override fun onError(e: Exception) {
-                            Log.e(TAG, "Photo processed failed: ${e.message}", e)
+                        override fun onError(exception: Exception) {
+                            Log.e(TAG, "Photo processed failed: ${exception.message}", exception)
                         }
                     })
                 }
