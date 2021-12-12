@@ -1,8 +1,12 @@
+/**
+ * Will Song: Wrote code for copyExifDataFromOriginal() and using it to copy EXIF to thumbnail img.
+ */
 package edu.uw.minh2804.rekognition.stores
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.FragmentActivity
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.scaleDown
@@ -71,6 +75,8 @@ class ImageProcessingStore(private val context: FragmentActivity) {
         val scaledDownBitmap = BitmapFactory.decodeFile(savedImageUriPath).scaleDown(ThumbnailSetting.MAX_DIMENSION)
         return createThumbnailOutputFileFrom(savedImageFile).also {
             scaledDownBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
+        }.also {
+            copyExifDataFromOriginal(savedImageFile, it)
         }
     }
 
@@ -82,6 +88,24 @@ class ImageProcessingStore(private val context: FragmentActivity) {
     private fun createThumbnailOutputFileFrom(originalImage: File): File {
         val fileName = originalImage.nameWithoutExtension + ".jpg"
         return File(thumbnailDirectory, fileName)
+    }
+
+    /**
+     * Copy exif data from original image to preserve orientation info
+     * References:
+     * 1. https://stackoverflow.com/questions/13596500/android-image-resizing-and-preserving-exif-data-orientation-rotation-etc
+     * 2. https://stackoverflow.com/questions/49407931/filenotfoundexception-when-using-exifinterface
+     * 3. https://stackoverflow.com/questions/66107689/androidx-exifinterface-crashes-when-try-to-saveattributes-write-failed-ebadf
+     */
+    private fun copyExifDataFromOriginal(originalImage: File, newImage: File) {
+        val originalImageExif = ExifInterface(originalImage.absolutePath)
+        originalImageExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let { orientationExif ->
+            val newImageFileDescriptor = context.contentResolver.openFileDescriptor(
+                Uri.fromFile(newImage), "rw")!!.fileDescriptor
+            val newImageExif = ExifInterface(newImageFileDescriptor)
+            newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, orientationExif)
+            newImageExif.saveAttributes()
+        }
     }
 
     private fun createProcessedResultOutputFileFrom(originalImage: File): File {
