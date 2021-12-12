@@ -39,9 +39,7 @@ object TextRecognitionService {
                 response.result!!.asJsonArray[0].asJsonObject[RESPONSE_KEY]?.let { rawAnnotation ->
                     val annotation = rawAnnotation.asJsonObject
                     Log.v(TAG, "Annotation: $annotation")
-                    // TODO: remove commented code
-                    // callback.onProcessed(TextAnnotation(annotation["text"].asString))
-                    callback.onProcessed(annotation["text"].asString)
+                     callback.onProcessed(TextAnnotation(annotation["text"].asString))
                 } ?: callback.onError(RESULT_NOT_FOUND_EXCEPTION)
             } else {
                 Log.e(TAG, "Task unsuccessful")
