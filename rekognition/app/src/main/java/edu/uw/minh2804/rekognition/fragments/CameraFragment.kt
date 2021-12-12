@@ -23,6 +23,7 @@ import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.ImageProcessingResult
 import edu.uw.minh2804.rekognition.stores.ImageProcessingResultStatusCode
 import edu.uw.minh2804.rekognition.stores.ImageProcessingStore
+import edu.uw.minh2804.rekognition.stores.ThumbnailSetting
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -102,7 +103,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun processImage(savedImageFile: File) {
         val savedImageUriPath = savedImageFile.toURI().path
-        val scaledDownBitmap = BitmapFactory.decodeFile(savedImageUriPath).scaleDown(ThumbnailSetting.MAX_DIMENSION)
+        val scaledDownBitmap = BitmapFactory.decodeFile(savedImageUriPath).scaleDown(
+            ThumbnailSetting.MAX_DIMENSION)
 
         TextRecognitionService.processImage(scaledDownBitmap, object : OnTextProcessedCallback {
             override fun onResultFound(annotation: TextAnnotation) {

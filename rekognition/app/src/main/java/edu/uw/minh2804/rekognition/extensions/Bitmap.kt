@@ -2,6 +2,7 @@ package edu.uw.minh2804.rekognition.extensions
 
 import android.graphics.Bitmap
 import android.util.Base64
+import androidx.core.graphics.scale
 import java.io.ByteArrayOutputStream
 
 fun Bitmap.scaleDown(maxDimension: Int): Bitmap {
