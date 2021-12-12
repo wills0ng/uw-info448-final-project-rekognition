@@ -29,7 +29,7 @@ object TextRecognitionService {
         annotateImage(request.toString()).addOnSuccessListener {
             val annotationElement = it.asJsonArray[0].asJsonObject["fullTextAnnotation"]
             if (annotationElement != null) {
-                val text = annotationElement.asJsonObject["fullTextAnnotation"].asString
+                val text = annotationElement.asJsonObject["text"].asString
                 callback.onResultFound(TextAnnotation(text))
             } else {
                 callback.onResultNotFound()
