@@ -5,18 +5,18 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
 object TextRecognitionRequest {
-    private val feature = JsonObject().apply { add("type", JsonPrimitive("TEXT_DETECTION")) }
-    private val features = JsonArray().apply { add(feature) }
+    private val feature = JsonObject().also { it.add("type", JsonPrimitive("TEXT_DETECTION")) }
+    private val features = JsonArray().also { it.add(feature) }
 
-    private val languageHints = JsonArray().apply { add("en") }
-    private val imageContext = JsonObject().apply { add("languageHints", languageHints) }
+    private val languageHints = JsonArray().also { it.add("en") }
+    private val imageContext = JsonObject().also { it.add("languageHints", languageHints) }
 
     fun createRequest(base64encoded: String): JsonObject {
-        val request = JsonObject().apply {
-            val image = JsonObject().apply { add("content", JsonPrimitive(base64encoded)) }
-            add("image", image)
-            add("features", features)
-            add("imageContext", imageContext)
+        val request = JsonObject().also { request ->
+            val image = JsonObject().also { it.add("content", JsonPrimitive(base64encoded)) }
+            request.add("image", image)
+            request.add("features", features)
+            request.add("imageContext", imageContext)
         }
         return request
     }
