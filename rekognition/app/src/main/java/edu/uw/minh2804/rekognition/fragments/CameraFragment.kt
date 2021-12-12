@@ -37,6 +37,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Need to make sure that Firebase is authenticated and app's permissions is granted
         if (!FirebaseAuthService.isSignedIn()) {
             FirebaseAuthService.signIn() //TODO: add callback to log failure
         }
@@ -152,6 +153,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private companion object {
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         const val TAG = "CameraFragment"
-        val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.INTERNET)
     }
 }
