@@ -40,15 +40,13 @@ object TextRecognitionService {
         annotateImage(request.toString()).addOnCompleteListener { response ->
             if (response.isSuccessful) {
                 Log.v(TAG, "Successful response $response")
-                if (response.result!!.asJsonArray[0].asJsonObject["fullTextAnnotation"] == null) {
-                    callback.onProcessed("")
-                } else {
-                    val annotation = response.result!!.asJsonArray[0].asJsonObject["fullTextAnnotation"].asJsonObject
+                response.result!!.asJsonArray[0].asJsonObject["fullTextAnnotation"]?.let { rawAnnotation ->
+                    val annotation = rawAnnotation.asJsonObject
                     Log.v(TAG, "Annotation: $annotation")
                     // TODO: remove commented code
                     // callback.onProcessed(TextAnnotation(annotation["text"].asString))
-                    callback.onProcessed(annotation!!["text"].asString)
-                }
+                    callback.onProcessed(annotation["text"].asString)
+                } ?: callback.onProcessed("")
             } else {
                 Log.e(TAG, "Task unsuccessful")
                 callback.onError(response.exception!!)
