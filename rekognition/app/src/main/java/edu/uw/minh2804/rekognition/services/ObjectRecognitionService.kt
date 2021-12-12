@@ -18,7 +18,8 @@ private const val RESPONSE_KEY = "labelAnnotations"
 private val FUNCTIONS = Firebase.functions
 
 interface OnObjectProcessedCallback {
-    fun onProcessed(annotation: ObjectAnnotation)
+    fun onResultFound(annotation: ObjectAnnotation)
+    fun onResultNotFound()
     fun onError(exception: Exception)
 }
 

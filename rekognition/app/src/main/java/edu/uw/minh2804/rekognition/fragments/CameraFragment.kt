@@ -3,6 +3,7 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -18,10 +19,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import edu.uw.minh2804.rekognition.R
-import edu.uw.minh2804.rekognition.services.FirebaseAuthService
-import edu.uw.minh2804.rekognition.services.OnTextProcessedCallback
-import edu.uw.minh2804.rekognition.services.TextAnnotation
-import edu.uw.minh2804.rekognition.services.TextRecognitionService
+import edu.uw.minh2804.rekognition.services.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,14 +36,21 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Need to make sure that Firebase is authenticated and app's permissions is granted
         if (!FirebaseAuthService.isSignedIn()) {
-            FirebaseAuthService.signIn() //TODO: add callback to log failure
+            FirebaseAuthService.signIn(object : OnSignedInCallback {
+                override fun onSignedIn() {}
+                override fun onError(exception: java.lang.Exception) {
+                    Log.e(TAG, exception.toString())
+                    requireActivity().finish()
+                }
+            })
         }
 
         if (isPermissionsGranted()) {
+            Log.v(TAG, "is granted")
             startCamera()
         } else {
+            Log.v(TAG, "no granted")
             requestPermissions()
         }
 
@@ -77,8 +82,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     val bitmap = BitmapFactory.decodeFile(savedUri.path)
 
                     TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
-                        override fun onProcessed(annotation: TextAnnotation) {
-                            Log.v(TAG, annotation.text)
+                        override fun onResultFound(annotation: TextAnnotation) {
+                            Log.v(TAG, annotation.text);
+                        }
+
+                        override fun onResultNotFound() {
+                            Log.v(TAG, "Result not found");
                         }
 
                         override fun onError(exception: Exception) {
@@ -87,8 +96,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     })
                 }
 
-                override fun onError(e: ImageCaptureException) {
-                    Log.e(TAG, "Photo save failed: ${e.message}", e)
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${exception.message}", exception)
                 }
             }
         )
@@ -96,35 +105,45 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
         cameraProviderFuture.addListener(Runnable {
             // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(requireView().findViewById<PreviewView>(R.id.preview_camera_finder).surfaceProvider)
                 }
-
             imageCapture = ImageCapture.Builder().build()
-
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
 
                 // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
-            } catch(exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+            } catch(exception: Exception) {
+                Log.e(TAG, "Use case binding failed", exception)
             }
         }, ContextCompat.getMainExecutor(requireActivity()))
     }
 
-    private fun isPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(requireActivity().baseContext, it) == PackageManager.PERMISSION_GRANTED
+    private fun getOutputDirectory(): File {
+        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else requireActivity().filesDir
+    }
+
+    private fun createUniqueOutputFile(): File {
+        val uniqueFileName = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
+        return File(outputDirectory, uniqueFileName)
+    }
+
+    private fun isPermissionsGranted(): Boolean {
+        return REQUIRED_PERMISSIONS.all {
+            ContextCompat.checkSelfPermission(requireActivity(), it) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun requestPermissions() {
@@ -139,17 +158,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             }
         } .run { launch(REQUIRED_PERMISSIONS) }
     }
-
-    private fun getOutputDirectory(): File {
-        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists()) mediaDir else requireActivity().filesDir
-    }
-    private fun createUniqueOutputFile(): File = File(
-        outputDirectory,
-        SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
-    )
 
     private companion object {
         const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

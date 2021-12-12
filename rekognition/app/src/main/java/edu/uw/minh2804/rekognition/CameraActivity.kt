@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayout
 
+private const val TAG = "CameraActivity"
+
 class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,9 +28,5 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
                 }
             }
         )
-    }
-
-    private companion object {
-        const val TAG = "CameraActivity"
     }
 }
