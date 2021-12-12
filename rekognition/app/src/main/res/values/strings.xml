@@ -1,6 +1,12 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!DOCTYPE resources [
+    <!ENTITY appname "Rekognition">
+    <!ENTITY image_labeling "Object">
+    ]>
+
 <resources>
-    <string name="app_name">Rekognition</string>
-    <string name="camera_image_labeling">Object</string>
+    <string name="app_name">&appname;</string>
+    <string name="camera_image_labeling">&image_labeling;</string>
     <string name="camera_label">Camera</string>
     <string name="camera_take_photo">Take Photo</string>
     <string name="camera_text_recognition">Text</string>
@@ -8,6 +14,8 @@
     <string name="main_label">Home</string>
     <string name="main_to_camera">Get Started</string>
     <string name="main_to_history">To History</string>
-    <string name="text_detection_explanation">With Rekognition, you can use your phone to read the words around you. Just point at what you think has words on it, and take a picture. We’ll take care of the rest.</string>
-    <string name="object_detection_explanation">If you want us to tell you what something is instead, then you can go to the ‘object’ tab and then take a picture of the object.</string>
+    <string name="text_detection_explanation">With &appname;, you can use your phone to read the words around you. Just point at what you think has words on it, and take a picture. We’ll take care of the rest.</string>
+    <string name="object_detection_explanation">If you want us to tell you what something is instead, then you can go to the \'&image_labeling;\' tab and then take a picture of the object.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
