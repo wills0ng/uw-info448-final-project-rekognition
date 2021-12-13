@@ -3,7 +3,6 @@ package edu.uw.minh2804.rekognition
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MenuInflater
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -50,8 +49,8 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
             photoStore.save(id, it.photo)
             thumbnailStore.save(id, it.thumbnail)
 
-            // annotationObserver is only observing once
-            val annotationObserver = object : Observer<Annotation?> {
+            // imageAnnotationObserver is only observing and will only invoke once per photo captured
+            val imageAnnotationObserver = object : Observer<Annotation?> {
                 override fun onChanged(response: Annotation?) {
                     if (response != null) {
                         annotationStore.save(id, response)
@@ -59,13 +58,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
                     model.imageAnnotation.removeObserver(this)
                 }
             }
-            model.imageAnnotation.observe(this, annotationObserver)
+            model.imageAnnotation.observe(this, imageAnnotationObserver)
         })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.menu, menu)
+        menuInflater.inflate(R.menu.menu, menu)
         return true
     }
 

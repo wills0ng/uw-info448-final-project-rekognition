@@ -48,10 +48,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener(Runnable
         { displayCameraFeed(cameraProviderFuture.get()) },
-            ContextCompat.getMainExecutor(requireActivity())
+            ContextCompat.getMainExecutor(requireContext())
         )
     }
 
@@ -74,7 +74,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private fun takePhoto() {
         if (imageCapture == null || !FirebaseAuthService.isSignedIn()) return
 
-        model.onCameraProcessing()
+        model.onCameraCapturing()
 
         val outputFile = photoStore.createOutputFile()
         val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
@@ -84,12 +84,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    model.onPhotoCaptured(CameraOutput(outputFile))
+                    model.onCameraCaptured(CameraOutput(outputFile))
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     Log.e(TAG, "Photo save failed: ${exception.message}", exception)
-                    model.onPhotoCaptureFailed()
+                    model.onCameraCaptureFailed(Exception(getString(R.string.camera_output_internal_error)))
                 }
             }
         )
