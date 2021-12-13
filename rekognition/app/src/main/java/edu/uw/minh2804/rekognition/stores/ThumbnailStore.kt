@@ -7,38 +7,34 @@ import androidx.fragment.app.FragmentActivity
 import edu.uw.minh2804.rekognition.R
 import java.io.File
 
-class ThumbnailItem(bitmap: Bitmap) {
-    val bitmap: Bitmap = bitmap.scale(ThumbnailSetting.MAX_WIDTH, ThumbnailSetting.MAX_HEIGHT)
+class Thumbnail(file: File) {
+    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scale(ThumbnailSetting.MAX_WIDTH, ThumbnailSetting.MAX_HEIGHT)
 }
 
-class ThumbnailStore(private val context: FragmentActivity) : ItemStore<ThumbnailItem> {
+class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnail> {
     private val directory: File by lazy {
         context.filesDir.let { appDirectory ->
             File(appDirectory, context.resources.getString(R.string.app_name) + ".thumbnails").also { it.mkdirs() }
         }
     }
 
-    override val items: List<SavedItem<ThumbnailItem>>
+    override val items: List<SavedItem<Thumbnail>>
         get() = directory.listFiles()!!.map {
-            readSavedThumbnailFrom(it)
+            SavedItem(it.nameWithoutExtension, Thumbnail(it))
         }
 
-    override fun findItem(id: String): SavedItem<ThumbnailItem>? {
+    override fun findItem(id: String): SavedItem<Thumbnail>? {
         val file = directory.listFiles()!!.firstOrNull {
             it.nameWithoutExtension == id
         }
-        return if (file != null) readSavedThumbnailFrom(file) else null
+        return if (file != null) SavedItem(file.nameWithoutExtension, Thumbnail(file)) else null
     }
 
-    override fun setItem(id: String, item: ThumbnailItem): SavedItem<ThumbnailItem> {
-        val file = File(directory, "$id.jpg").also {
+    override fun save(id: String, item: Thumbnail): SavedItem<Thumbnail> {
+        File(directory, "$id.jpg").let {
             item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
         }
-        return readSavedThumbnailFrom(file)
-    }
-
-    private fun readSavedThumbnailFrom(file: File): SavedItem<ThumbnailItem> {
-        return SavedItem(file.nameWithoutExtension, ThumbnailItem(BitmapFactory.decodeFile(file.path)))
+        return SavedItem(id, item)
     }
 }
 

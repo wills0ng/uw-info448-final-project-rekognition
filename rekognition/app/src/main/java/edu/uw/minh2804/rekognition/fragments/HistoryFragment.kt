@@ -1,4 +1,7 @@
-/** Will Song: I wrote this file. */
+/**
+ * Will Song: Wrote most of this file.
+ * Tom Nguyen: Wrote code for the onViewCreated() method and the `histories` attribute.
+ * */
 
 package edu.uw.minh2804.rekognition.fragments
 
@@ -15,20 +18,17 @@ import edu.uw.minh2804.rekognition.databinding.FragmentHistoryBinding
 import edu.uw.minh2804.rekognition.stores.ImageProcessingResult
 import edu.uw.minh2804.rekognition.stores.ImageProcessingStore
 import edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel
-import edu.uw.minh2804.rekognition.viewmodels.HistoryViewModelFactory
-import java.io.File
 
 class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
-    private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history) {
-        HistoryViewModelFactory(getImagesDirectory())
-    }
+    private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
+    private lateinit var histories: Array<ImageProcessingResult>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.i(TAG, "HistoryFragment created")
+        Log.d(TAG, "HistoryFragment created")
 
         // Inflate the layout for this fragment with data binding
         val binding = FragmentHistoryBinding.inflate(inflater)
@@ -45,13 +45,9 @@ class HistoryFragment : Fragment() {
         return binding.root
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private lateinit var histories: Array<ImageProcessingResult>
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        Log.d(TAG, "Getting results from ImageProcessingStore")
         // IMPORTANT: ImageProcessingStore can only be initialized after onViewCreated lifecycle
         histories = ImageProcessingStore(requireActivity()).results
 
@@ -61,18 +57,7 @@ class HistoryFragment : Fragment() {
             Log.v(TAG, history.result)
             Log.v(TAG, history.statusCode.toString())
         }
-    }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Function to get the directory the images / text are stored in.
-     */
-    private fun getImagesDirectory(): File {
-        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists()) mediaDir else requireActivity().filesDir
+        viewModel.populateHistoryList(histories)
     }
 
     companion object {

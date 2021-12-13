@@ -8,5 +8,5 @@ data class SavedItem<T>(
 interface ItemStore<T> {
     val items: List<SavedItem<T>>
     fun findItem(id: String): SavedItem<T>?
-    fun setItem(id: String, item: T): SavedItem<T>
+    fun save(id: String, item: T): SavedItem<T>
 }
