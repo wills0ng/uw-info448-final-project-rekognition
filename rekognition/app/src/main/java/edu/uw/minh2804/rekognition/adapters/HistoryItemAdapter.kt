@@ -16,7 +16,8 @@ import edu.uw.minh2804.rekognition.models.HistoryItem
 class HistoryItemAdapter : ListAdapter<HistoryItem, HistoryItemAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = HistoryItemBinding.inflate(LayoutInflater.from(parent.context))
+        val binding = HistoryItemBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

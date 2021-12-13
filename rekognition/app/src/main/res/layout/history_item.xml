@@ -8,23 +8,31 @@
             type="edu.uw.minh2804.rekognition.models.HistoryItem" />
     </data>
 
-    <LinearLayout
+    <androidx.cardview.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="?android:attr/listPreferredItemHeight"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:src="@{item.image}"
-            android:contentDescription="@{item.text}" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@{item.text}"
-             />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        card_view:cardCornerRadius="4dp"
+        android:layout_margin="5dp"
+        card_view:cardElevation="5dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@{item.image}"
+                android:contentDescription="@{item.text}" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:padding="15dp"
+                android:textSize="20sp"
+                android:text="@{item.text}" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </layout>

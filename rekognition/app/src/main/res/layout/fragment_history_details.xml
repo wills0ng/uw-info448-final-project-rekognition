@@ -32,23 +32,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    card_view:cardCornerRadius="8dp"
+                    android:layout_margin="15dp"
+                    card_view:cardElevation="5dp">
 
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@{item.image}"
-                        android:contentDescription="@{item.text}"/>
-
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{item.text}" />
+                        android:orientation="vertical">
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scaleType="fitXY"
+                            android:adjustViewBounds="true"
+                            android:src="@{item.image}"
+                            android:contentDescription="@{item.text}"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@{item.text}"
+                            android:padding="15dp"
+                            android:textSize="20sp"
+                            />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
 
             </ScrollView>
 
@@ -66,6 +81,5 @@
             app:tint="@color/white" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 </layout>

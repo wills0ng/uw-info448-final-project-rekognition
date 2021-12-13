@@ -42,7 +42,7 @@ class HistoryFragment : Fragment() {
         binding.viewModel = viewModel
 
         // Set the adapter for the RecyclerView
-        binding.recyclerView.adapter = HistoryItemAdapter()
+        binding.recyclerViewHistory.adapter = HistoryItemAdapter()
 
         // Set click listener for the floating action button to go from history to camera
         binding.fabHistoryToCamera.setOnClickListener {
