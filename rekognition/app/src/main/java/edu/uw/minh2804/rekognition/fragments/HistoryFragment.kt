@@ -50,6 +50,12 @@ class HistoryFragment : Fragment() {
             startActivity(intent)
         }
 
+        // Add up navigation to toolbar
+        binding.toolbarHistory.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        binding.toolbarHistory.setNavigationOnClickListener {
+            requireActivity().onNavigateUp()
+        }
+
         return binding.root
     }
 

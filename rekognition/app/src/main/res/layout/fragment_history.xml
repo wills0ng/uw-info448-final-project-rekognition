@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_history"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 app:title="History"
