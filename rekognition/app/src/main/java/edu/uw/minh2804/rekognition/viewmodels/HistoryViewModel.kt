@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.models.HistoryItem
-import edu.uw.minh2804.rekognition.stores.ImageProcessingResult
 
 /**
  * A view model for the HistoryFragment. Holds history for images captured using this app

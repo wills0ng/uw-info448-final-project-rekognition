@@ -13,10 +13,6 @@ object FirebaseAuthService {
     private val AUTH = Firebase.auth
     val UNAUTHORIZED_EXCEPTION = Exception("User is not signed into Firebase")
 
-    fun signIn() {
-        AUTH.signInAnonymously()
-    }
-
     fun signIn(callback: OnSignedInCallback) {
         AUTH.signInAnonymously()
             .addOnSuccessListener { callback.onSignedIn() }
