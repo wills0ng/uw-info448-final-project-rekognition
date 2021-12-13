@@ -2,7 +2,6 @@
 
 package edu.uw.minh2804.rekognition.viewmodels
 
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

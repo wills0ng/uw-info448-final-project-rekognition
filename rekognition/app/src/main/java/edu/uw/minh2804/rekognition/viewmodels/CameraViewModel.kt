@@ -3,14 +3,12 @@ package edu.uw.minh2804.rekognition.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
 import edu.uw.minh2804.rekognition.stores.Annotation
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import java.lang.Exception
 
 enum class CameraState {
-    IDLE, PROCESSING, PROCESSED, FAILED
+    IDLE, CAPTURING, CAPTURED
 }
 
 class CameraViewModel : ViewModel() {
@@ -26,32 +24,32 @@ class CameraViewModel : ViewModel() {
     val imageAnnotation: LiveData<Annotation?>
         get() = _imageAnnotation
 
-    fun onCameraProcessing() {
-        _cameraState.value = CameraState.PROCESSING
+    private val _encounteredError = MutableLiveData<Exception>()
+    val encounteredError: LiveData<Exception>
+        get() = _encounteredError
+
+    fun onCameraCapturing() {
+        _cameraState.value = CameraState.CAPTURING
     }
 
-    fun onPhotoCaptured(output: CameraOutput) {
-        _capturedPhoto.value = output
-        _cameraState.value = CameraState.PROCESSED
+    fun onCameraCaptured(photo: CameraOutput) {
+        _capturedPhoto.value = photo
+        _cameraState.value = CameraState.CAPTURED
     }
 
-    fun onPhotoCaptureFailed() {
-        _cameraState.value = CameraState.FAILED
-        viewModelScope.launch {
-            delay(1000 * CAMERA_STATE_CHANGE_DURATION.toLong())
-            _cameraState.value = CameraState.IDLE
-        }
+    fun onCameraCaptureFailed(exception: Exception) {
+        _encounteredError.value = exception
+        _cameraState.value = CameraState.IDLE
     }
 
-    fun onImageAnnotated(output: Annotation?) {
+    fun onImageAnnotated(output: Annotation) {
         _imageAnnotation.value = output
-        viewModelScope.launch {
-            delay(1000 * CAMERA_STATE_CHANGE_DURATION.toLong())
-            _cameraState.value = CameraState.IDLE
-        }
+        _cameraState.value = CameraState.IDLE
     }
 
-    companion object {
-        const val CAMERA_STATE_CHANGE_DURATION = 4
+    fun onImageAnnotateFailed(exception: Exception) {
+        _imageAnnotation.value = null
+        _encounteredError.value = exception
+        _cameraState.value = CameraState.IDLE
     }
 }
