@@ -8,12 +8,17 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-
 import edu.uw.minh2804.rekognition.databinding.HistoryItemBinding
 import edu.uw.minh2804.rekognition.fragments.HistoryFragmentDirections
 import edu.uw.minh2804.rekognition.models.HistoryItem
 
 class HistoryItemAdapter : ListAdapter<HistoryItem, HistoryItemAdapter.ViewHolder>(DiffCallback()) {
+    class ViewHolder(private val binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: HistoryItem) {
+            binding.item = item
+            binding.executePendingBindings()
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = HistoryItemBinding.inflate(
@@ -30,21 +35,14 @@ class HistoryItemAdapter : ListAdapter<HistoryItem, HistoryItemAdapter.ViewHolde
             it.findNavController().navigate(action)
         }
     }
+}
 
-    class ViewHolder(private val binding: HistoryItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: HistoryItem) {
-            binding.item = item
-            binding.executePendingBindings()
-        }
+class DiffCallback : DiffUtil.ItemCallback<HistoryItem>() {
+    override fun areItemsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean {
+        return oldItem == newItem
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<HistoryItem>() {
-        override fun areItemsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean {
-            return oldItem.image == newItem.image
-        }
+    override fun areContentsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean {
+        return oldItem.image == newItem.image
     }
 }

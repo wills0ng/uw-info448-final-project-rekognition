@@ -11,11 +11,8 @@ import com.google.android.material.tabs.TabLayout
 import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
-import java.util.concurrent.ExecutorService
 
 class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
-    private lateinit var cameraExecutor: ExecutorService
-
     private lateinit var annotationStore: AnnotationStore
     private lateinit var photoStore: PhotoStore
     private lateinit var thumbnailStore: ThumbnailStore

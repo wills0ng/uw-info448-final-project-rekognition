@@ -1,6 +1,7 @@
 package edu.uw.minh2804.rekognition.services
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
@@ -24,18 +25,14 @@ data class TextAnnotation(
     val text: String
 )
 
-data class AnnotateImageResponse(
-    val fullTextAnnotation: TextAnnotation?,
-    val labelAnnotations: EntityAnnotation?
-)
-
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#textannotation
-data class BatchAnnotateImagesResponse(
-    val responses: List<AnnotateImageResponse>
+data class AnnotateImageResponse(
+    val fullTextAnnotation: List<TextAnnotation>?,
+    val labelAnnotations: List<EntityAnnotation>?
 )
 
 interface FirebaseFunctionsCallback {
-    fun onProcessed(annotation: BatchAnnotateImagesResponse)
+    fun onProcessed(annotation: AnnotateImageResponse)
     fun onError(exception: Exception)
 }
 
@@ -57,7 +54,7 @@ object FirebaseFunctionsService {
         }
         val response = callFunction(endpoint, body)
         response.addOnSuccessListener {
-            val result = Gson().fromJson(it, BatchAnnotateImagesResponse::class.java) // Deserialize Json into BatchAnnotateImagesResponse object
+            val result = Gson().fromJson(it.asJsonArray.first(), AnnotateImageResponse::class.java) // Deserialize Json into BatchAnnotateImagesResponse object
             callback.onProcessed(result)
         }
         response.addOnFailureListener {

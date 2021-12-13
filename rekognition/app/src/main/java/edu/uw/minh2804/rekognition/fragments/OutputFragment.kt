@@ -42,10 +42,10 @@ class OutputFragment : Fragment(R.layout.fragment_output) {
 
         model.capturedPhoto.observe(this) {
             FirebaseFunctionsService.annotateImage(it.thumbnail.bitmap, object : FirebaseFunctionsCallback {
-                override fun onProcessed(annotation: BatchAnnotateImagesResponse) {
-                    val result = annotation.responses.first().fullTextAnnotation
+                override fun onProcessed(annotation: AnnotateImageResponse) {
+                    val result = annotation?.fullTextAnnotation?.first()?.text
                     if (result != null) {
-                        outputView.text = result.text
+                        outputView.text = result
                         model.onImageAnnotated(Annotation(annotation))
                     } else {
                         outputView.text = "No text detected"

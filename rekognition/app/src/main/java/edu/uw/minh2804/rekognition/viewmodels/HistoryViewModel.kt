@@ -23,16 +23,20 @@ class HistoryViewModel : ViewModel() {
     init {
         Log.d(TAG, "HistoryViewModel initialized")
     }
+/*
 
-    /**
+    */
+/**
      * Populate the history list from saved data in storage.
-     */
+     *//*
+
     fun populateHistoryList(historyData: Array<ImageProcessingResult>) {
         Log.d(TAG, "Initializing the history list")
         _historyList.value = historyData.map {
             HistoryItem(image=Uri.parse(it.thumbnailUriPath), text=it.result)
         }
     }
+*/
 
     companion object {
         private val TAG = HistoryViewModel::class.simpleName
