@@ -1,7 +1,6 @@
 package edu.uw.minh2804.rekognition.services
 
 import android.graphics.Bitmap
-import edu.uw.minh2804.rekognition.extensions.scaleDown
 import edu.uw.minh2804.rekognition.extensions.toString64
 
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#EntityAnnotation
@@ -20,7 +19,7 @@ object ObjectRecognitionService {
             callback.onError(FirebaseAuthService.UNAUTHORIZED_EXCEPTION)
             return
         }
-        val request = ObjectRecognitionRequest.createRequest(image.scaleDown(ImageRecognitionSetting.MAX_DIMENSION).toString64())
+        val request = ObjectRecognitionRequest.createRequest(image.toString64())
         val response = FirebaseFunctionsService.callFunction("labelImage", request)
 
         // responses and labelAnnotations will each be a single-element array in our case

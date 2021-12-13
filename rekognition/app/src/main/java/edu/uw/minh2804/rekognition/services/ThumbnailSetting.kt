@@ -1,5 +1,5 @@
 package edu.uw.minh2804.rekognition.services
 
-object ImageRecognitionSetting {
+object ThumbnailSetting {
     const val MAX_DIMENSION = 640
 }

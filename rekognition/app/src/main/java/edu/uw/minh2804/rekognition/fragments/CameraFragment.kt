@@ -3,9 +3,7 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,14 +18,14 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.OnPermissionGrantedCallback
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
+import edu.uw.minh2804.rekognition.extensions.scaleDown
 import edu.uw.minh2804.rekognition.services.*
+import edu.uw.minh2804.rekognition.stores.ImageProcessingResult
+import edu.uw.minh2804.rekognition.stores.ImageProcessingResultStatusCode
+import edu.uw.minh2804.rekognition.stores.ImageProcessingStore
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -35,8 +33,8 @@ import kotlinx.coroutines.launch
 class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var imageCapture: ImageCapture? = null
 
-    private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var imageProcessingStore: ImageProcessingStore
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,71 +44,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
 
-        outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
+        imageProcessingStore = ImageProcessingStore(requireActivity())
     }
 
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-    }
-
-    private fun takePhoto() {
-        if (imageCapture == null || !FirebaseAuthService.isSignedIn()) {
-            return
-        }
-
-        val outputFile = createUniqueOutputFile()
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
-
-        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay)
-        textView.text = LOADING_OUTPUT_TEXT
-        textView.visibility = View.VISIBLE
-
-        imageCapture!!.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(requireContext()),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(outputFile)
-                    val bitmap = BitmapFactory.decodeFile(savedUri.path)
-                    processImage(bitmap)
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Log.e(TAG, "Photo save failed: ${exception.message}", exception)
-                }
-            }
-        )
-    }
-
-    private fun processImage(bitmap: Bitmap) {
-        TextRecognitionService.processImage(bitmap, object : OnTextProcessedCallback {
-            override fun onResultFound(annotation: TextAnnotation) {
-                displayText(annotation.text, 5)
-            }
-
-            override fun onResultNotFound() {
-                displayText("No text detected", 5)
-            }
-
-            override fun onError(exception: Exception) {
-                Log.e(TAG, "Photo processed failed: ${exception.message}", exception)
-                displayText("Something went wrong, please try again later.", 5)
-            }
-        })
-    }
-
-    private fun displayText(text: String, durationInSeconds: Long) {
-        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay).apply { this.text = text }
-        viewLifecycleOwner.lifecycleScope.launch {
-            delay(1000 * durationInSeconds)
-            textView?.let {
-                if (it.text != LOADING_OUTPUT_TEXT) {
-                    it.visibility = View.INVISIBLE
-                }
-            }
-        }
     }
 
     private fun startCamera() {
@@ -133,32 +73,70 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }, ContextCompat.getMainExecutor(requireActivity()))
     }
 
-    private fun createUniqueOutputFile(): File {
-        val uniqueFileName = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg"
-        return File(outputDirectory, uniqueFileName)
-    }
-
-    private fun getOutputDirectory(): File {
-        val mediaDir = requireActivity().externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+    private fun takePhoto() {
+        if (imageCapture == null || !FirebaseAuthService.isSignedIn()) {
+            return
         }
-        return if (mediaDir != null && mediaDir.exists()) mediaDir else requireActivity().filesDir
+
+        val outputFile = imageProcessingStore.createUniqueImageOutputFile()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
+
+        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay)
+        textView.text = PROCESSING_IMAGE_OUTPUT
+        textView.visibility = View.VISIBLE
+
+        imageCapture!!.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    processImage(outputFile)
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${exception.message}", exception)
+                }
+            }
+        )
     }
 
-    private fun requireCamera() {
-        val requiredPermission = Manifest.permission.CAMERA
-        if (requireActivity().isPermissionGranted(requiredPermission)) {
-            startCamera()
-        } else {
-            requireActivity().requestPermission(requiredPermission, object : OnPermissionGrantedCallback {
-                override fun onPermissionGranted() {
-                    startCamera()
-                }
+    private fun processImage(savedImageFile: File) {
+        val savedImageUriPath = savedImageFile.toURI().path
+        val scaledDownBitmap = BitmapFactory.decodeFile(savedImageUriPath).scaleDown(ThumbnailSetting.MAX_DIMENSION)
 
-                override fun onPermissionDenied() {
-                    requireActivity().finish()
+        TextRecognitionService.processImage(scaledDownBitmap, object : OnTextProcessedCallback {
+            override fun onResultFound(annotation: TextAnnotation) {
+                val savedThumbnailUriPath = imageProcessingStore.saveImageToThumbnailFile(savedImageFile).toURI().path
+                val result = ImageProcessingResult(savedImageUriPath, savedThumbnailUriPath, annotation.text, ImageProcessingResultStatusCode.RESULT_FOUND)
+
+                imageProcessingStore.saveResultToFile(savedImageFile, result)
+                displayText(annotation.text, OUTPUT_DISPLAY_DURATION)
+            }
+
+            override fun onResultNotFound() {
+                val savedThumbnailUriPath = imageProcessingStore.saveImageToThumbnailFile(savedImageFile).toURI().path
+                val result = ImageProcessingResult(savedImageUriPath, savedThumbnailUriPath, RESULT_NOT_FOUND_OUTPUT, ImageProcessingResultStatusCode.RESULT_NOT_FOUND)
+
+                imageProcessingStore.saveResultToFile(savedImageFile, result)
+                displayText(RESULT_NOT_FOUND_OUTPUT, OUTPUT_DISPLAY_DURATION)
+            }
+
+            override fun onError(exception: Exception) {
+                Log.e(TAG, "Photo processed failed: ${exception.message}", exception)
+                displayText("Something went wrong, please try again later.", OUTPUT_DISPLAY_DURATION)
+            }
+        })
+    }
+
+    private fun displayText(text: String, durationInSeconds: Int) {
+        val textView = requireView().findViewById<TextView>(R.id.text_output_overlay).apply { this.text = text }
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(1000 * durationInSeconds.toLong())
+            textView?.let {
+                if (it.text != PROCESSING_IMAGE_OUTPUT) {
+                    it.visibility = View.INVISIBLE
                 }
-            })
+            }
         }
     }
 
@@ -181,9 +159,27 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
     }
 
+    private fun requireCamera() {
+        val requiredPermission = Manifest.permission.CAMERA
+        if (requireActivity().isPermissionGranted(requiredPermission)) {
+            startCamera()
+        } else {
+            requireActivity().requestPermission(requiredPermission, object : OnPermissionGrantedCallback {
+                override fun onPermissionGranted() {
+                    startCamera()
+                }
+
+                override fun onPermissionDenied() {
+                    requireActivity().finish()
+                }
+            })
+        }
+    }
+
     private companion object {
-        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        const val LOADING_OUTPUT_TEXT = "Processing..."
+        const val OUTPUT_DISPLAY_DURATION = 5
+        const val PROCESSING_IMAGE_OUTPUT = "Processing..."
+        const val RESULT_NOT_FOUND_OUTPUT = "No text detected"
         const val TAG = "CameraFragment"
     }
 }
