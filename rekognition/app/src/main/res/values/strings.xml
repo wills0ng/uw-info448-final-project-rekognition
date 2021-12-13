@@ -21,4 +21,5 @@
     <string name="camera_output_on_processing">Processing...</string>
     <string name="camera_output_result_not_found">No text detected</string>
     <string name="camera_output_internal_error">Something went wrong, please try again later.</string>
+    <string name="take_picture">Take Picture</string>
 </resources>
