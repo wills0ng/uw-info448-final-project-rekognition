@@ -22,4 +22,9 @@
     <style name="Theme.Rekognition.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Rekognition.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">32sp</item>
+    </style>
+
 </resources>
