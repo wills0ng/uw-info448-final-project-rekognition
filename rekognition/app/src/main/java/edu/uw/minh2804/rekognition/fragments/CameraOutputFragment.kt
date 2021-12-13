@@ -18,7 +18,7 @@ import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 
-class OutputFragment : Fragment(R.layout.fragment_output) {
+class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class OutputFragment : Fragment(R.layout.fragment_output) {
                     outputView.visibility = View.INVISIBLE
                 }
                 CameraState.PROCESSING -> {
-                    outputView.text = "Processing..."
+                    outputView.text = getString(R.string.camera_output_on_processing)
                     outputView.visibility = View.VISIBLE
                 }
                 else -> {
@@ -51,14 +51,14 @@ class OutputFragment : Fragment(R.layout.fragment_output) {
                         outputView.text = result
                         model.onImageAnnotated(Annotation(annotation))
                     } else {
-                        outputView.text = "No text detected"
+                        outputView.text = getString(R.string.camera_output_on_no_result_found)
                         model.onImageAnnotated(null)
                     }
                 }
 
                 override fun onError(exception: Exception) {
                     Log.e(TAG, exception.toString())
-                    outputView.text = "Something went wrong, please try again later."
+                    outputView.text = getString(R.string.camera_output_on_error)
                     model.onImageAnnotated(null)
                 }
             })
