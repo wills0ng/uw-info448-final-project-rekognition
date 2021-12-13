@@ -5,6 +5,7 @@
 
 package edu.uw.minh2804.rekognition.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.navGraphViewModels
+import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.adapters.HistoryItemAdapter
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryBinding
@@ -40,7 +42,19 @@ class HistoryFragment : Fragment() {
         binding.viewModel = viewModel
 
         // Set the adapter for the RecyclerView
-        binding.recyclerView.adapter = HistoryItemAdapter()
+        binding.recyclerViewHistory.adapter = HistoryItemAdapter()
+
+        // Set click listener for the floating action button to go from history to camera
+        binding.fabHistoryToCamera.setOnClickListener {
+            val intent = Intent(activity, CameraActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Add up navigation to toolbar
+        binding.toolbarHistory.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        binding.toolbarHistory.setNavigationOnClickListener {
+            requireActivity().onNavigateUp()
+        }
 
         return binding.root
     }
@@ -57,6 +71,7 @@ class HistoryFragment : Fragment() {
             Log.v(TAG, history.result)
             Log.v(TAG, history.statusCode.toString())
         }
+        // Populate the ViewModel with history data
         viewModel.populateHistoryList(histories)
     }
 

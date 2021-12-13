@@ -2,6 +2,8 @@ package edu.uw.minh2804.rekognition
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -10,7 +12,6 @@ import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     private lateinit var cameraExecutor: ExecutorService
@@ -24,7 +25,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        setSupportActionBar(findViewById(R.id.toolbar))
 
         findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
@@ -53,7 +54,7 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
             thumbnailStore.save(id, it.thumbnail)
 
             // annotationObserver is only observing once
-            val annotationObserver = object : Observer<Annotation> {
+            val annotationObserver = object : Observer<Annotation?> {
                 override fun onChanged(response: Annotation?) {
                     if (response != null) {
                         annotationStore.save(id, response)
@@ -63,6 +64,12 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
             }
             model.imageAnnotation.observe(this, annotationObserver)
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu, menu)
+        return true
     }
 
     companion object {

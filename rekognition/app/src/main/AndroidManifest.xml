@@ -13,10 +13,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Rekognition">
+        android:theme="@style/Theme.Rekognition.NoActionBar">
         <activity
             android:name=".HistoryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Rekognition.NoActionBar"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".CameraActivity"
             android:exported="false" />
