@@ -3,10 +3,10 @@ package edu.uw.minh2804.rekognition.stores
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import edu.uw.minh2804.rekognition.R
-import edu.uw.minh2804.rekognition.services.BatchAnnotateImagesResponse
+import edu.uw.minh2804.rekognition.services.AnnotateImageResponse
 import java.io.File
 
-data class Annotation(val result: BatchAnnotateImagesResponse)
+data class Annotation(val result: AnnotateImageResponse)
 
 class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotation> {
     private val directory: File by lazy {
@@ -36,7 +36,7 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
 
     private fun readAnnotationFrom(file: File): SavedItem<Annotation> {
         val item = file.reader().let {
-            var result = Gson().fromJson(it, BatchAnnotateImagesResponse::class.java)
+            var result = Gson().fromJson(it, AnnotateImageResponse::class.java)
             it.close()
             result
         }
