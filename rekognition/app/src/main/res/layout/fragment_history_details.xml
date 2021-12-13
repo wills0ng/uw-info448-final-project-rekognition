@@ -11,41 +11,60 @@
             type="edu.uw.minh2804.rekognition.models.HistoryItem" />
     </data>
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            app:title="Details"
-            android:background="@color/purple_500"
-            app:titleTextColor="@color/white" />
+            android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <androidx.appcompat.widget.Toolbar
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_width="match_parent"
+                app:title="Details"
+                android:background="@color/purple_500"
+                app:titleTextColor="@color/white" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@{item.image}"
-                    android:contentDescription="@{item.text}"/>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{item.text}" />
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@{item.image}"
+                        android:contentDescription="@{item.text}"/>
 
-        </ScrollView>
-    </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@{item.text}" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_historyDetails_toCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/history_fab_margin"
+            android:contentDescription="@string/history_fab_contentDescription"
+            android:src="@drawable/ic_baseline_camera_24"
+            app:backgroundTint="@color/purple_500"
+            app:tint="@color/white" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
 </layout>

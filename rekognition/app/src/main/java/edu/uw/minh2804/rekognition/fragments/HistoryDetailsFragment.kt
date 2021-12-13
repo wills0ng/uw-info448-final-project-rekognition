@@ -2,12 +2,14 @@
 
 package edu.uw.minh2804.rekognition.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryDetailsBinding
 
 class HistoryDetailsFragment : Fragment() {
@@ -28,6 +30,12 @@ class HistoryDetailsFragment : Fragment() {
         val item = HistoryDetailsFragmentArgs.fromBundle(requireArguments()).item
         Log.v(TAG,"The info passed in was $item")
         binding.item = item
+
+        // Set click listener for the floating action button to go from history to camera
+        binding.fabHistoryDetailsToCamera.setOnClickListener {
+            val intent = Intent(activity, CameraActivity::class.java)
+            startActivity(intent)
+        }
 
         return binding.root
     }
