@@ -5,29 +5,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragments.HistoryFragment">
+
     <data>
         <variable
             name="viewModel"
             type="edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel"
             />
     </data>
-    <LinearLayout
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:orientation="vertical">
-        <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            app:title="History"
-            android:background="@color/purple_500"
-            app:titleTextColor="@color/white"
-            />
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:historyList="@{viewModel.historyList}"
-            />
-    </LinearLayout>
+            android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:title="History"
+                android:background="@color/purple_500"
+                app:titleTextColor="@color/white"
+                />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:historyList="@{viewModel.historyList}"
+                />
+        </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_history_toCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/history_fab_margin"
+            android:contentDescription="@string/history_fab_contentDescription"
+            android:src="@drawable/ic_baseline_camera_24"
+            app:backgroundTint="@color/purple_500"
+            app:tint="@color/white" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
