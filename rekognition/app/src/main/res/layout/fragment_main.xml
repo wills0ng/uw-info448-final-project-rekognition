@@ -48,12 +48,4 @@
         android:layout_height="0dp"
         android:layout_weight="3"
         />
-
-    <Button
-        android:id="@+id/button_main_to_history"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="@string/main_to_history"
-        android:layout_margin="@dimen/main_button_margin"
-        />
 </LinearLayout>

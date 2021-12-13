@@ -17,10 +17,5 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             val intent = Intent(activity, CameraActivity::class.java)
             startActivity(intent)
         }
-
-        view.findViewById<Button>(R.id.button_main_to_history).setOnClickListener {
-            val intent = Intent(activity, HistoryActivity::class.java)
-            startActivity(intent)
-        }
     }
 }
