@@ -1,6 +1,7 @@
 package edu.uw.minh2804.rekognition
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 
 class HistoryActivity : AppCompatActivity() {
@@ -10,10 +11,9 @@ class HistoryActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
     }
 
-    // TODO: delete if we will not have a settings page
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        val inflater: MenuInflater = menuInflater
-//        inflater.inflate(R.menu.menu_history, menu)
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_history, menu)
+        return true
+    }
 }

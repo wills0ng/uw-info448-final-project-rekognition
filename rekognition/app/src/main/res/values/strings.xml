@@ -17,6 +17,5 @@
     <string name="text_detection_explanation">With <xliff:g id="appname">&appname;</xliff:g>, you can use your phone to read the words around you. Just point at what you think has words on it, and take a picture. We\'ll take care of the rest.</string>
     <string name="object_detection_explanation">If instead you want us to tell you what something is, then you can go to the \'&image_labeling;\' tab and then take a picture of the object.</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="compose">Compose</string>
     <string name="history_fab_contentDescription">Go To Camera</string>
 </resources>
