@@ -1,6 +1,7 @@
 package edu.uw.minh2804.rekognition
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 
 class HistoryActivity : AppCompatActivity() {
