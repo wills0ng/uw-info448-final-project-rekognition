@@ -52,6 +52,6 @@ class CameraViewModel : ViewModel() {
     }
 
     companion object {
-        const val CAMERA_STATE_CHANGE_DURATION = 4
+        const val CAMERA_STATE_CHANGE_DURATION = 5
     }
 }

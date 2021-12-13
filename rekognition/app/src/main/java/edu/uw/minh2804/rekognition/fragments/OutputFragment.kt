@@ -29,7 +29,10 @@ class OutputFragment : Fragment(R.layout.fragment_output) {
 
         model.cameraState.observe(this) {
             when(it) {
-                CameraState.IDLE -> outputView.visibility = View.INVISIBLE
+                CameraState.IDLE -> {
+                    outputView.text = ""
+                    outputView.visibility = View.INVISIBLE
+                }
                 CameraState.PROCESSING -> {
                     outputView.text = "Processing..."
                     outputView.visibility = View.VISIBLE
@@ -43,7 +46,7 @@ class OutputFragment : Fragment(R.layout.fragment_output) {
         model.capturedPhoto.observe(this) {
             FirebaseFunctionsService.annotateImage(it.thumbnail.bitmap, object : FirebaseFunctionsCallback {
                 override fun onProcessed(annotation: AnnotateImageResponse) {
-                    val result = annotation?.fullTextAnnotation?.first()?.text
+                    val result = annotation.fullTextAnnotation?.text
                     if (result != null) {
                         outputView.text = result
                         model.onImageAnnotated(Annotation(annotation))

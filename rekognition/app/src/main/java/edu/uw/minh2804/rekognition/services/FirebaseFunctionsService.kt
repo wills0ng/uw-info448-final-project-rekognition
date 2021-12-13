@@ -27,8 +27,8 @@ data class TextAnnotation(
 
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#textannotation
 data class AnnotateImageResponse(
-    val fullTextAnnotation: List<TextAnnotation>?,
-    val labelAnnotations: List<EntityAnnotation>?
+    val fullTextAnnotation: TextAnnotation?,
+    val labelAnnotations: List<EntityAnnotation>
 )
 
 interface FirebaseFunctionsCallback {
