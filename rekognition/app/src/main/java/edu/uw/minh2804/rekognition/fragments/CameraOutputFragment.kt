@@ -64,7 +64,12 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                                 model.onImageAnnotated()
                             }
                             else -> {
-                                displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
+                                when (currentEndpoint) {
+                                    FirebaseFunctionsService.Endpoint.TEXT ->
+                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "text"))
+                                    FirebaseFunctionsService.Endpoint.OBJECT ->
+                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "object"))
+                                }
                                 model.onImageAnnotateFailed()
                             }
                         }
