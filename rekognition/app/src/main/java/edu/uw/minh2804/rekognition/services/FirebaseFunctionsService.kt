@@ -10,6 +10,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import edu.uw.minh2804.rekognition.extensions.toString64
 import edu.uw.minh2804.rekognition.fragments.CameraOutputFragment
+import java.lang.Exception
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine

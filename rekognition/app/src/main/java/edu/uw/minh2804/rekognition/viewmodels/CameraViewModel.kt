@@ -24,10 +24,6 @@ class CameraViewModel : ViewModel() {
     val imageAnnotation: LiveData<Annotation?>
         get() = _imageAnnotation
 
-    private val _encounteredError = MutableLiveData<Exception>()
-    val encounteredError: LiveData<Exception>
-        get() = _encounteredError
-
     fun onCameraCapturing() {
         _cameraState.value = CameraState.CAPTURING
     }
@@ -39,7 +35,6 @@ class CameraViewModel : ViewModel() {
 
     fun onCameraCaptureFailed(exception: Exception) {
         _cameraState.value = CameraState.IDLE
-        _encounteredError.value = exception
     }
 
     fun onImageAnnotated(output: Annotation) {
@@ -47,9 +42,8 @@ class CameraViewModel : ViewModel() {
         _imageAnnotation.value = output
     }
 
-    fun onImageAnnotateFailed(exception: Exception) {
+    fun onImageAnnotateFailed() {
         _cameraState.value = CameraState.IDLE
         _imageAnnotation.value = null
-        _encounteredError.value = exception
     }
 }
