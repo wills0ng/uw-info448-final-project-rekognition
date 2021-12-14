@@ -13,9 +13,9 @@ enum class CameraState {
 }
 
 class CameraViewModel : ViewModel() {
-    private val _firebaseFunction = MutableLiveData<Endpoint>()
+    private val _firebaseEndpoint = MutableLiveData<Endpoint>()
     val firebaseEndpoint: LiveData<Endpoint>
-        get() = _firebaseFunction
+        get() = _firebaseEndpoint
 
     private val _cameraState = MutableLiveData<CameraState>()
     val cameraState: LiveData<CameraState>
@@ -29,11 +29,8 @@ class CameraViewModel : ViewModel() {
     val imageAnnotation: LiveData<Annotation?>
         get() = _imageAnnotation
 
-    fun onSetCameraTab(tabPosition: Int) {
-        when (tabPosition) {
-            0 -> _firebaseFunction.value = Endpoint.TEXT
-            1 -> _firebaseFunction.value = Endpoint.OBJECT
-        }
+    fun onSetCameraTab(endpoint: Endpoint) {
+        _firebaseEndpoint.value = endpoint
     }
 
     fun onCameraCapturing() {

@@ -1,21 +1,23 @@
 package edu.uw.minh2804.rekognition.services
 
+import android.content.Context
 import android.graphics.Bitmap
-import android.util.Log
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.toString64
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-interface SuspendCallable {
-//    val resultType: String
-    suspend fun apply(image: Bitmap): AnnotateImageResponse
+interface Annotator {
+    fun getResultType(context: Context): String
+    fun formatResult(result: AnnotateImageResponse): String?
+    suspend fun annotate(image: Bitmap): AnnotateImageResponse
 }
 
 data class Property(
@@ -41,16 +43,26 @@ data class AnnotateImageResponse(
 object FirebaseFunctionsService {
     private val functions = Firebase.functions
 
-    enum class Endpoint : SuspendCallable {
+    enum class Endpoint : Annotator {
         TEXT {
-//            override val resultType: String get() = getResources().getString()
-            override suspend fun apply(image: Bitmap) = requestAnnotation(
+            override fun getResultType(context: Context): String {
+                return context.getString(R.string.camera_text_recognition)
+            }
+            override fun formatResult(result: AnnotateImageResponse): String? {
+                return result.fullTextAnnotation?.text
+            }
+            override suspend fun annotate(image: Bitmap) = requestAnnotation(
                 "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
             )
         },
         OBJECT {
-//            override val resultType: String get() = "text"
-            override suspend fun apply(image: Bitmap) = requestAnnotation(
+            override fun getResultType(context: Context): String {
+                return context.getString(R.string.camera_image_labeling)
+            }
+            override fun formatResult(result: AnnotateImageResponse): String? {
+                return result.fullTextAnnotation?.text
+            }
+            override suspend fun annotate(image: Bitmap) = requestAnnotation(
                 "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
             )
         }

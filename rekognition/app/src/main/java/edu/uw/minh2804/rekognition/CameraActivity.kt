@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService
 import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
@@ -21,7 +22,17 @@ class CameraActivity : ActionBarActivity(R.layout.activity_camera) {
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     Log.v(TAG, "${tab!!.text.toString()} tab selected")
-                    model.onSetCameraTab(tabPosition = tab.position)
+                    model.onSetCameraTab(
+                        when (tab!!.text) {
+                            getString(R.string.camera_text_recognition) -> FirebaseFunctionsService.Endpoint.TEXT
+                            getString(R.string.camera_image_labeling) -> FirebaseFunctionsService.Endpoint.OBJECT
+                            else -> {
+                                Log.e(TAG, "Tab label ${tab.text} inconsistent with resources")
+                                Log.v(TAG, "Setting firebase endpoint to default: TEXT")
+                                FirebaseFunctionsService.Endpoint.TEXT
+                            }
+                        }
+                    )
                 }
 
                 override fun onTabReselected(tab: TabLayout.Tab?) {

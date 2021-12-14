@@ -47,11 +47,11 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         }
 
         model.capturedPhoto.observe(this) {
-            val seconds = 10L
             lifecycleScope.launch {
                 try {
-                    withTimeout(1000 * seconds) {
-                        val result = currentEndpoint.apply(it.thumbnail.bitmap)
+                    // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
+                    withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
+                        val result = currentEndpoint.annotate(it.thumbnail.bitmap)
                         when {
                             result.fullTextAnnotation != null -> {
                                 displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
@@ -62,12 +62,10 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                                 model.onImageAnnotated(Annotation(result))
                             }
                             else -> {
-                                when (currentEndpoint) {
-                                    Endpoint.TEXT ->
-                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "text"))
-                                    Endpoint.OBJECT ->
-                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "object"))
-                                }
+                                displayViewInFixedDuration(outputView, getString(
+                                    R.string.camera_output_result_not_found,
+                                    currentEndpoint.getResultType(requireContext())
+                                ))
                                 model.onImageAnnotateFailed()
                             }
                         }
@@ -117,6 +115,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     }
 
     companion object {
+        const val CONNECTION_TIMEOUT_IN_SECONDS = 10L
         const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5L
         private const val TAG = "CameraOutputFragment"
     }
