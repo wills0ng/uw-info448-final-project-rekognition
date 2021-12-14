@@ -5,11 +5,16 @@ package edu.uw.minh2804.rekognition.viewmodels
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
+import edu.uw.minh2804.rekognition.models.AnnotationPair
 import edu.uw.minh2804.rekognition.models.HistoryItem
 import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint.OBJECT
+import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.stores.PhotoStore
+import edu.uw.minh2804.rekognition.stores.SavedItem
 import edu.uw.minh2804.rekognition.stores.ThumbnailStore
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * A view model for the HistoryFragment. Holds history for images captured using this app
@@ -38,16 +43,24 @@ class HistoryViewModel : ViewModel() {
         // Then look up thumbnails and annotations
         _historyList.value = photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
             val id = photo.value.id
+            val date = SimpleDateFormat(PhotoStore.FILENAME_FORMAT, Locale.US).parse(id)
             val photoUri = Uri.fromFile(photo.value.item.file)
             val thumbnailUri = thumbnailStore.getUri(id)
-            val savedAnnotation = annotationStore.findItem(id)
-            val annotation = savedAnnotation?.let { it ->
-                val result = it.item.result
-                result.fullTextAnnotation?.text ?: OBJECT.formatResult(result)
-            }
+            val annotation = parseAnnotation(annotationStore.findItem(id))
 
-            HistoryItem(id, photoUri, thumbnailUri, annotation)
+            HistoryItem(id, date, photoUri, thumbnailUri, annotation)
         }
+    }
+
+    private fun parseAnnotation(savedAnnotation: SavedItem<Annotation>?): AnnotationPair {
+        return savedAnnotation?.let {
+            with(it.item.result) {
+                this.fullTextAnnotation?.let { textAnnotation ->
+                    AnnotationPair("Text", textAnnotation.text)
+                } ?:
+                    AnnotationPair("Objects", OBJECT.formatResult(this))
+            }
+        } ?: AnnotationPair("No Result", null)
     }
 
     companion object {
