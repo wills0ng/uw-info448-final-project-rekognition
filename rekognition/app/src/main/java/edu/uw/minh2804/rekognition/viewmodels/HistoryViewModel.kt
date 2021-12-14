@@ -36,7 +36,7 @@ class HistoryViewModel : ViewModel() {
         Log.d(TAG, "Initializing the history list")
         // Note: treat photo store as source of truth since users can delete photos
         // Then look up thumbnails and annotations
-        _historyList.value = photoStore.items.map { photo ->
+        _historyList.value = photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
             val id = photo.value.id
             val photoUri = Uri.fromFile(photo.value.item.file)
             val thumbnailUri = thumbnailStore.getUri(id)
