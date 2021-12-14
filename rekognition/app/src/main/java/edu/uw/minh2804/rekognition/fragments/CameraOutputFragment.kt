@@ -20,7 +20,6 @@ import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.coroutines.suspendCoroutine
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
@@ -29,12 +28,12 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         super.onViewCreated(view, savedInstanceState)
         requireFirebaseOrShutdown()
 
-        val output = view.findViewById<TextView>(R.id.text_output_overlay)
+        val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
 
-        observeCameraState(output)
-        observeCapturedPhoto(output)
-        observeEncounteredError(output)
-        observeImageAnnotation(output)
+        observeCameraState(outputView)
+        observeCapturedPhoto()
+        observeEncounteredError(outputView)
+        observeImageAnnotation(outputView)
     }
 
     private fun observeCameraState(output: TextView) {
@@ -46,7 +45,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         }
     }
 
-    private fun observeCapturedPhoto(output: TextView) {
+    private fun observeCapturedPhoto() {
         model.capturedPhoto.observe(this) {
             lifecycleScope.launch {
                 try {
