@@ -47,7 +47,7 @@ class CameraActivity : ActionBarActivity(R.layout.activity_camera) {
                 thumbnailStore.save(id, it.thumbnail)
             }
 
-            // imageAnnotationObserver is only observing and will only invoke once per photo captured
+            // This observer will only observe and only invoke once
             val imageAnnotationObserver = object : Observer<Annotation?> {
                 override fun onChanged(response: Annotation?) {
                     if (response != null) {

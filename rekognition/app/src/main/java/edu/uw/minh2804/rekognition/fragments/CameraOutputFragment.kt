@@ -39,46 +39,41 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         model.cameraState.observe(this) {
             if (it == CameraState.CAPTURING) {
                 outputView.text = getString(R.string.camera_output_on_processing)
-                displayViewInXDuration(outputView)
+                outputView.visibility = View.VISIBLE
             }
         }
 
         model.capturedPhoto.observe(this) {
+            val seconds = 10L
             lifecycleScope.launch {
                 try {
-                    val result = currentEndpoint.apply(it.thumbnail.bitmap)
-                    if (result.fullTextAnnotation != null) {
-                        model.onImageAnnotated(Annotation(result))
-                    } else {
-                        model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_result_not_found)))
+                    withTimeout(1000 * seconds) {
+                        val result = currentEndpoint.apply(it.thumbnail.bitmap)
+                        if (result.fullTextAnnotation != null) {
+                            displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
+                            model.onImageAnnotated(Annotation(result))
+                        } else {
+                            displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
+                            model.onImageAnnotateFailed()
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, e.toString())
-                    model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_internal_error)))
+                    displayViewInFixedDuration(outputView, getString(R.string.camera_output_internal_error))
+                    model.onImageAnnotateFailed()
                 }
-            }
-        }
-
-        model.encounteredError.observe(this) {
-            outputView.text = it.message!!
-            displayViewInXDuration(outputView)
-        }
-
-        model.imageAnnotation.observe(this) {
-            if (it != null) {
-                outputView.text = it.result.fullTextAnnotation!!.text
-                displayViewInXDuration(outputView)
             }
         }
     }
 
-    private fun displayViewInXDuration(view: TextView) {
+    private fun displayViewInFixedDuration(view: TextView, output: String) {
         // displayViewInXDuration could be previously called and the delay haven't elapsed yet,
         // so cancelling the previous call is needed to reset the clock.
         scope.coroutineContext.cancelChildren()
+        view.text = output
         view.visibility = View.VISIBLE
         scope.launch {
-            delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
+            delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS)
             view.visibility = View.INVISIBLE
         }
     }
@@ -107,7 +102,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     }
 
     companion object {
-        const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5
+        const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5L
         private const val TAG = "OutputFragment"
     }
 }

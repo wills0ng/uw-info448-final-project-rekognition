@@ -18,9 +18,9 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
         }
     }
 
-    override val items: List<SavedItem<Annotation>>
+    override val items: List<Lazy<SavedItem<Annotation>>>
         get() = directory.listFiles()!!.map {
-            readAnnotationFrom(it)
+            lazy { readAnnotationFrom(it) }
         }
 
     override suspend fun findItem(id: String): SavedItem<Annotation>? {

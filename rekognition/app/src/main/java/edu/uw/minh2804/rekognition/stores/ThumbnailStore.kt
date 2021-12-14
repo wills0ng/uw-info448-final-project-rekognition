@@ -6,9 +6,9 @@ import androidx.core.graphics.scale
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class Thumbnail(file: File) {
     val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scale(ThumbnailSetting.MAX_WIDTH, ThumbnailSetting.MAX_HEIGHT)
@@ -21,9 +21,9 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
         }
     }
 
-    override val items: List<SavedItem<Thumbnail>>
+    override val items: List<Lazy<SavedItem<Thumbnail>>>
         get() = directory.listFiles()!!.map {
-            SavedItem(it.nameWithoutExtension, Thumbnail(it))
+            lazy { SavedItem(it.nameWithoutExtension, Thumbnail(it)) }
         }
 
     override suspend fun findItem(id: String): SavedItem<Thumbnail>? {
