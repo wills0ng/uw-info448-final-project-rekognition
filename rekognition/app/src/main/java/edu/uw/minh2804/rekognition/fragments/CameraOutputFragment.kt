@@ -23,7 +23,7 @@ import kotlinx.coroutines.*
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
-    private var currentEndpoint: AnnotationCallback = FirebaseFunctionsService.TextDetection
+    private var currentEndpoint: AnnotationCallback = FirebaseFunctionsService.TextAnnotationCallback
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -26,8 +26,8 @@ class CameraViewModel : ViewModel() {
 
     fun onSetCameraTab(tabPosition: Int) {
         when (tabPosition) {
-            0 -> _firebaseFunction.value = FirebaseFunctionsService.TextDetection
-            1 -> _firebaseFunction.value = FirebaseFunctionsService.ObjectDetection
+            0 -> _firebaseFunction.value = FirebaseFunctionsService.TextAnnotationCallback
+            1 -> _firebaseFunction.value = FirebaseFunctionsService.ObjectAnnotationCallback
         }
     }
 

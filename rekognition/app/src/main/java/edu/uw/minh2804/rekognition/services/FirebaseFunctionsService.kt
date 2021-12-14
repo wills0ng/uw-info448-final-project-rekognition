@@ -47,7 +47,7 @@ object FirebaseFunctionsService {
     private const val TAG = "FirebaseFunctionsService"
     private val functions = Firebase.functions
 
-    object TextDetection : AnnotationCallback {
+    object TextAnnotationCallback : AnnotationCallback {
         override suspend fun requestAnnotation(image: Bitmap) = requestAnnotation(
             "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
         )
@@ -61,7 +61,7 @@ object FirebaseFunctionsService {
         }
     }
 
-    object ObjectDetection : AnnotationCallback {
+    object ObjectAnnotationCallback : AnnotationCallback {
         override suspend fun requestAnnotation(image: Bitmap) = requestAnnotation(
             "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
         )
