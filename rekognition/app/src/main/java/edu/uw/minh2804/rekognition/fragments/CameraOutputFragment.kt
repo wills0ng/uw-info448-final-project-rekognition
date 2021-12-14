@@ -56,7 +56,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                                 displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
                                 model.onImageAnnotated(Annotation(result))
                             }
-                            result.labelAnnotations != null -> {
+                            result.labelAnnotations.any() -> {
                                 displayViewInFixedDuration(outputView, result.labelAnnotations.first().description)
                                 model.onImageAnnotated(Annotation(result))
                             }
@@ -112,6 +112,6 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     companion object {
         const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5L
-        private const val TAG = "OutputFragment"
+        private const val TAG = "CameraOutputFragment"
     }
 }

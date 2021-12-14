@@ -67,7 +67,7 @@ class HistoryFragment : Fragment() {
         val thumbnails = ThumbnailStore(requireActivity()).items
 
         for (annotation in annotations) {
-            Log.v(TAG, annotation.value.toString())
+            Log.v("HistoryFragment", annotation.value.toString())
             //Log.v(TAG, annotation.item.result.fullTextAnnotation?.text.toString())
         }
         /*for (thumbnail in thumbnails) {

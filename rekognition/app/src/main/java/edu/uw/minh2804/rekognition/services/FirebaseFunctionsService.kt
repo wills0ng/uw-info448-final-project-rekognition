@@ -32,7 +32,7 @@ data class TextAnnotation(
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#textannotation
 data class AnnotateImageResponse(
     val fullTextAnnotation: TextAnnotation?,
-    val labelAnnotations: List<EntityAnnotation>?
+    val labelAnnotations: List<EntityAnnotation>
 )
 
 object FirebaseFunctionsService {
@@ -64,7 +64,6 @@ object FirebaseFunctionsService {
                 }
                 .addOnFailureListener { continuation.resumeWithException(it) }
         }
-        Log.v("TEST", result.toString())
         return Gson().fromJson(result.asJsonArray.first(), AnnotateImageResponse::class.java)
     }
 }

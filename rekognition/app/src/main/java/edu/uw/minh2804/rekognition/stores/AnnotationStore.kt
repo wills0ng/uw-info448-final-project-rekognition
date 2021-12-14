@@ -43,10 +43,10 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
 
     private fun readAnnotationFrom(file: File): SavedItem<Annotation> {
         val item = file.reader().let {
-            val result = Gson().fromJson(it, AnnotateImageResponse::class.java)
+            val result = Gson().fromJson(it, Annotation::class.java)
             it.close()
             result
         }
-        return SavedItem(file.nameWithoutExtension, Annotation(item))
+        return SavedItem(file.nameWithoutExtension, item)
     }
 }
