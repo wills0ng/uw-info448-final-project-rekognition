@@ -33,23 +33,23 @@ class CameraViewModel : ViewModel() {
     }
 
     fun onCameraCaptured(photo: CameraOutput) {
-        _capturedPhoto.value = photo
         _cameraState.value = CameraState.CAPTURED
+        _capturedPhoto.value = photo
     }
 
     fun onCameraCaptureFailed(exception: Exception) {
-        _encounteredError.value = exception
         _cameraState.value = CameraState.IDLE
+        _encounteredError.value = exception
     }
 
     fun onImageAnnotated(output: Annotation) {
-        _imageAnnotation.value = output
         _cameraState.value = CameraState.IDLE
+        _imageAnnotation.value = output
     }
 
     fun onImageAnnotateFailed(exception: Exception) {
+        _cameraState.value = CameraState.IDLE
         _imageAnnotation.value = null
         _encounteredError.value = exception
-        _cameraState.value = CameraState.IDLE
     }
 }

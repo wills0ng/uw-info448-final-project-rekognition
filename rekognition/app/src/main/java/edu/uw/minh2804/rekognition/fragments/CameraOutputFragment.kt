@@ -18,11 +18,11 @@ import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -30,22 +30,13 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
 
-        observeCameraState(outputView)
-        observeCapturedPhoto()
-        observeEncounteredError(outputView)
-        observeImageAnnotation(outputView)
-    }
-
-    private fun observeCameraState(output: TextView) {
         model.cameraState.observe(this) {
             if (it == CameraState.CAPTURING) {
-                output.text = getString(R.string.camera_output_on_processing)
-                output.visibility = View.VISIBLE
+                outputView.text = getString(R.string.camera_output_on_processing)
+                displayViewInXDuration(outputView)
             }
         }
-    }
 
-    private fun observeCapturedPhoto() {
         model.capturedPhoto.observe(this) {
             lifecycleScope.launch {
                 try {
@@ -61,29 +52,28 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 }
             }
         }
-    }
 
-    private fun observeEncounteredError(output: TextView) {
         model.encounteredError.observe(this) {
-            output.text = it.message!!
-            output.visibility = View.VISIBLE
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
-                output.visibility = View.INVISIBLE
+            outputView.text = it.message!!
+            displayViewInXDuration(outputView)
+        }
+
+        model.imageAnnotation.observe(this) {
+            if (it != null) {
+                outputView.text = it.result.fullTextAnnotation!!.text
+                displayViewInXDuration(outputView)
             }
         }
     }
 
-    private fun observeImageAnnotation(output: TextView) {
-        model.imageAnnotation.observe(this) {
-            if (it != null) {
-                output.text = it.result.fullTextAnnotation!!.text
-                output.visibility = View.VISIBLE
-                viewLifecycleOwner.lifecycleScope.launch {
-                    delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
-                    output.visibility = View.INVISIBLE
-                }
-            }
+    private fun displayViewInXDuration(view: TextView) {
+        // displayViewInXDuration could be previously called and the delay haven't elapsed yet,
+        // so cancelling the previous call is needed to reset the clock.
+        scope.coroutineContext.cancelChildren()
+        view.visibility = View.VISIBLE
+        scope.launch {
+            delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
+            view.visibility = View.INVISIBLE
         }
     }
 
@@ -103,6 +93,11 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 FirebaseAuthService.signIn()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scope.cancel()
     }
 
     companion object {
