@@ -6,17 +6,14 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
 import edu.uw.minh2804.rekognition.models.HistoryItem
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint.OBJECT
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
-import edu.uw.minh2804.rekognition.stores.SavedItem
-import edu.uw.minh2804.rekognition.stores.Thumbnail
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
+import edu.uw.minh2804.rekognition.stores.PhotoStore
+import edu.uw.minh2804.rekognition.stores.ThumbnailStore
 
 /**
  * A view model for the HistoryFragment. Holds history for images captured using this app
- * and the associated detected text / objects. It is initialized with the images directory
- * passed from the HistoryFragment.
+ * and the associated detected text / objects.
  */
 class HistoryViewModel : ViewModel() {
 
@@ -29,14 +26,27 @@ class HistoryViewModel : ViewModel() {
     }
 
     /**
-     * Populate the history list from the thumbnails directory.
+     * Populate the history list from stored data.
      */
-    suspend fun populateHistoryList(thumbnailUris: List<Uri>, annotationStore: AnnotationStore) {
+    suspend fun populateHistoryList(
+        photoStore: PhotoStore,
+        thumbnailStore: ThumbnailStore,
+        annotationStore: AnnotationStore
+    ) {
         Log.d(TAG, "Initializing the history list")
-        _historyList.value = thumbnailUris.map {
-            val id = File(it.path!!).nameWithoutExtension
-            val annotation = annotationStore.findItem(id)
-            HistoryItem(image=it, text=annotation.toString())
+        // Note: treat photo store as source of truth since users can delete photos
+        // Then look up thumbnails and annotations
+        _historyList.value = photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
+            val id = photo.value.id
+            val photoUri = Uri.fromFile(photo.value.item.file)
+            val thumbnailUri = thumbnailStore.getUri(id)
+            val savedAnnotation = annotationStore.findItem(id)
+            val annotation = savedAnnotation?.let { it ->
+                val result = it.item.result
+                result.fullTextAnnotation?.text ?: OBJECT.formatResult(result)
+            }
+
+            HistoryItem(id, photoUri, thumbnailUri, annotation)
         }
     }
 
