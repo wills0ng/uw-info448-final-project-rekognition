@@ -2,6 +2,7 @@ package edu.uw.minh2804.rekognition.services
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Parcelable
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -10,6 +11,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.toString64
+import kotlinx.parcelize.Parcelize
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -25,20 +27,23 @@ data class Property(
     val value: String
 )
 
+@Parcelize
 data class EntityAnnotation(
     val description: String,
     val score: Double
-)
+) : Parcelable
 
+@Parcelize
 data class TextAnnotation(
     val text: String
-)
+) : Parcelable
 
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#textannotation
+@Parcelize
 data class AnnotateImageResponse(
     val fullTextAnnotation: TextAnnotation?,
     val labelAnnotations: List<EntityAnnotation>
-)
+) : Parcelable
 
 object FirebaseFunctionsService {
     private const val TAG = "FirebaseFunctionsService"

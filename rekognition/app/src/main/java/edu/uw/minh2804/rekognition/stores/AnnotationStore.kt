@@ -1,5 +1,6 @@
 package edu.uw.minh2804.rekognition.stores
 
+import android.os.Parcelable
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
@@ -9,8 +10,10 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 
-data class Annotation(val result: AnnotateImageResponse)
+@Parcelize
+data class Annotation(val result: AnnotateImageResponse) : Parcelable
 
 class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotation> {
     private val directory: File by lazy {

@@ -30,11 +30,6 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
             lazy { SavedItem(it.nameWithoutExtension, Thumbnail(it)) }
         }
 
-    val uris: List<Uri>
-        get() = directory.listFiles()!!.map {
-            Uri.fromFile(it)
-        }
-
     override suspend fun findItem(id: String): SavedItem<Thumbnail>? {
         return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
             val file = directory.listFiles()!!.firstOrNull {

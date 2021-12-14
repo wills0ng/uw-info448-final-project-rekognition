@@ -6,14 +6,14 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
 import edu.uw.minh2804.rekognition.models.HistoryItem
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint.OBJECT
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.stores.PhotoStore
 import edu.uw.minh2804.rekognition.stores.ThumbnailStore
 
 /**
  * A view model for the HistoryFragment. Holds history for images captured using this app
- * and the associated detected text / objects. It is initialized with the images directory
- * passed from the HistoryFragment.
+ * and the associated detected text / objects.
  */
 class HistoryViewModel : ViewModel() {
 
@@ -26,7 +26,7 @@ class HistoryViewModel : ViewModel() {
     }
 
     /**
-     * Populate the history list from the thumbnails directory.
+     * Populate the history list from stored data.
      */
     suspend fun populateHistoryList(
         photoStore: PhotoStore,
@@ -40,9 +40,13 @@ class HistoryViewModel : ViewModel() {
             val id = photo.value.id
             val photoUri = Uri.fromFile(photo.value.item.file)
             val thumbnailUri = thumbnailStore.getUri(id)
-            val annotation = annotationStore.findItem(id)
+            val savedAnnotation = annotationStore.findItem(id)
+            val annotation = savedAnnotation?.let { it ->
+                val result = it.item.result
+                result.fullTextAnnotation?.text ?: OBJECT.formatResult(result)
+            }
 
-            HistoryItem(photoUri, thumbnailUri, annotation.toString())
+            HistoryItem(id, photoUri, thumbnailUri, annotation)
         }
     }
 
