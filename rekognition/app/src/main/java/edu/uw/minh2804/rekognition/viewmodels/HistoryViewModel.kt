@@ -4,11 +4,13 @@ package edu.uw.minh2804.rekognition.viewmodels
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import edu.uw.minh2804.rekognition.models.HistoryItem
+import edu.uw.minh2804.rekognition.stores.AnnotationStore
+import edu.uw.minh2804.rekognition.stores.SavedItem
 import edu.uw.minh2804.rekognition.stores.Thumbnail
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -29,10 +31,12 @@ class HistoryViewModel : ViewModel() {
     /**
      * Populate the history list from the thumbnails directory.
      */
-    fun populateHistoryList(thumbnailUris: List<Uri>, ) {
+    suspend fun populateHistoryList(thumbnailUris: List<Uri>, annotationStore: AnnotationStore) {
         Log.d(TAG, "Initializing the history list")
         _historyList.value = thumbnailUris.map {
-            HistoryItem(image=it, text="Hello")
+            val id = File(it.path!!).nameWithoutExtension
+            val annotation = annotationStore.findItem(id)
+            HistoryItem(image=it, text=annotation.toString())
         }
     }
 

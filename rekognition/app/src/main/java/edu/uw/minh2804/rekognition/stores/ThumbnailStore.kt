@@ -3,16 +3,18 @@ package edu.uw.minh2804.rekognition.stores
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.core.graphics.scale
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
+import edu.uw.minh2804.rekognition.extensions.scaleDown
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class Thumbnail(file: File) {
-    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scale(ThumbnailSetting.MAX_WIDTH, ThumbnailSetting.MAX_HEIGHT)
+    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scaleDown(ThumbnailSetting.MAX_DIMENSION)
+    val orientation: String? = ExifInterface(file.absolutePath).getAttribute(ExifInterface.TAG_ORIENTATION)
 }
 
 class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnail> {
@@ -45,6 +47,12 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
         return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
             File(directory, "$id.jpg").let {
                 item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
+                // Save thumbnail with exif data containing original image orientation
+                val fileDescriptor = context.contentResolver.openFileDescriptor(
+                    Uri.fromFile(it), "rw")!!.fileDescriptor
+                val exif = ExifInterface(fileDescriptor)
+                exif.setAttribute(ExifInterface.TAG_ORIENTATION, item.orientation)
+                exif.saveAttributes()
             }
             SavedItem(id, item)
         }
@@ -52,6 +60,5 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
 }
 
 object ThumbnailSetting {
-    const val MAX_HEIGHT = 320
-    const val MAX_WIDTH = 320
+    const val MAX_DIMENSION = 640
 }

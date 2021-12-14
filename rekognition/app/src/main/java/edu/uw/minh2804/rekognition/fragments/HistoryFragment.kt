@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.navGraphViewModels
 import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.R
@@ -19,6 +20,7 @@ import edu.uw.minh2804.rekognition.adapters.HistoryItemAdapter
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryBinding
 import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel
+import kotlinx.coroutines.launch
 
 class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
@@ -62,44 +64,12 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "Getting results from ImageProcessingStore")
 
         // IMPORTANT: Stores can only be initialized after onViewCreated lifecycle
-        val annotations = AnnotationStore(requireActivity()).items
-        PhotoStore(requireActivity())
-        val thumbnails = ThumbnailStore(requireActivity()).items
-
-        for (annotation in annotations) {
-            Log.v("HistoryFragment", annotation.value.toString())
-            //Log.v(TAG, annotation.item.result.fullTextAnnotation?.text.toString())
-        }
-        /*for (thumbnail in thumbnails) {
-            Log.v(TAG, thumbnail.item.bitmap.toString())
-        }*/
-
+        val annotationStore = AnnotationStore(requireActivity())
         val thumbnailUris = ThumbnailStore(requireActivity()).uris
-        viewModel.populateHistoryList(thumbnailUris)
-    }
-
-/*
-
-    */
-/**
-     * Copy exif data from original image to preserve orientation info
-     * References:
-     * 1. https://stackoverflow.com/questions/13596500/android-image-resizing-and-preserving-exif-data-orientation-rotation-etc
-     * 2. https://stackoverflow.com/questions/49407931/filenotfoundexception-when-using-exifinterface
-     * 3. https://stackoverflow.com/questions/66107689/androidx-exifinterface-crashes-when-try-to-saveattributes-write-failed-ebadf
-     *//*
-
-    private fun copyExifDataFromOriginal(originalImage: File, newImage: File) {
-        val originalImageExif = ExifInterface(originalImage.absolutePath)
-        originalImageExif.getAttribute(ExifInterface.TAG_ORIENTATION)?.let { orientationExif ->
-            val newImageFileDescriptor = context.contentResolver.openFileDescriptor(
-                Uri.fromFile(newImage), "rw")!!.fileDescriptor
-            val newImageExif = ExifInterface(newImageFileDescriptor)
-            newImageExif.setAttribute(ExifInterface.TAG_ORIENTATION, orientationExif)
-            newImageExif.saveAttributes()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.populateHistoryList(thumbnailUris, annotationStore)
         }
     }
-*/
 
     companion object {
         private val TAG = HistoryFragment::class.simpleName
