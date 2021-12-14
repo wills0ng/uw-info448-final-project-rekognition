@@ -2,6 +2,7 @@ package edu.uw.minh2804.rekognition.stores
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.core.graphics.scale
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +25,11 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
     override val items: List<Lazy<SavedItem<Thumbnail>>>
         get() = directory.listFiles()!!.map {
             lazy { SavedItem(it.nameWithoutExtension, Thumbnail(it)) }
+        }
+
+    val uris: List<Uri>
+        get() = directory.listFiles()!!.map {
+            Uri.fromFile(it)
         }
 
     override suspend fun findItem(id: String): SavedItem<Thumbnail>? {

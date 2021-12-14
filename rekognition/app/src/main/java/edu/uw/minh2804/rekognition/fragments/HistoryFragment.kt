@@ -62,9 +62,20 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "Getting results from ImageProcessingStore")
 
         // IMPORTANT: Stores can only be initialized after onViewCreated lifecycle
-        AnnotationStore(requireActivity())
+        val annotations = AnnotationStore(requireActivity()).items
         PhotoStore(requireActivity())
-        ThumbnailStore(requireActivity())
+        val thumbnails = ThumbnailStore(requireActivity()).items
+
+        for (annotation in annotations) {
+            Log.v(TAG, annotation.value.toString())
+            //Log.v(TAG, annotation.item.result.fullTextAnnotation?.text.toString())
+        }
+        /*for (thumbnail in thumbnails) {
+            Log.v(TAG, thumbnail.item.bitmap.toString())
+        }*/
+
+        val thumbnailUris = ThumbnailStore(requireActivity()).uris
+        viewModel.populateHistoryList(thumbnailUris)
     }
 
 /*
