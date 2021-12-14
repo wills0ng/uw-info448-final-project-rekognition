@@ -23,12 +23,18 @@ import kotlinx.coroutines.launch
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
+    private var currentEndpoint: FirebaseEndpoint = FirebaseEndpoint.TEXT
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireFirebaseOrShutdown()
 
         val output = view.findViewById<TextView>(R.id.text_output_overlay)
+
+        model.firebaseEndpoint.observe(this) {
+            Log.v(TAG, "Changing endpoint to: $it")
+            currentEndpoint = it
+        }
 
         observeCameraState(output)
         observeCapturedPhoto(output)
@@ -47,7 +53,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     private fun observeCapturedPhoto(output: TextView) {
         model.capturedPhoto.observe(this) {
-            FirebaseFunctionsService.annotateImage(
+            currentEndpoint.apply(
                 it.thumbnail.bitmap,
                 object : FirebaseFunctionsCallback {
                     override fun onProcessed(annotation: AnnotateImageResponse) {

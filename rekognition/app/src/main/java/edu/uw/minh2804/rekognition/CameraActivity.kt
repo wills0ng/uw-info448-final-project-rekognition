@@ -28,15 +28,16 @@ class CameraActivity : AppCompatActivity(R.layout.activity_camera) {
         findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, tab!!.text.toString())
+                    Log.v(TAG, "${tab!!.text.toString()} tab selected")
+                    model.onSetCameraTab(tabPosition = tab.position)
                 }
 
                 override fun onTabReselected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, tab!!.text.toString())
+                    Log.v(TAG, "${tab!!.text.toString()} tab reselected")
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, tab!!.text.toString())
+                    Log.v(TAG, "${tab!!.text.toString()} tab unselected")
                 }
             }
         )

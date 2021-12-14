@@ -10,6 +10,22 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import edu.uw.minh2804.rekognition.extensions.toString64
+import kotlin.reflect.KCallable
+import kotlin.reflect.KParameter
+
+interface SimpleCallable { fun apply(image: Bitmap, callback: FirebaseFunctionsCallback) }
+
+enum class FirebaseEndpoint : SimpleCallable {
+    TEXT {
+        override fun apply(image: Bitmap, callback: FirebaseFunctionsCallback) =
+            FirebaseFunctionsService.annotateImage(image, callback)
+    },
+    OBJECT {
+        override fun apply(image: Bitmap, callback: FirebaseFunctionsCallback) =
+            FirebaseFunctionsService.labelImage(image, callback)
+    }
+}
+
 
 data class Property(
     val name: String,

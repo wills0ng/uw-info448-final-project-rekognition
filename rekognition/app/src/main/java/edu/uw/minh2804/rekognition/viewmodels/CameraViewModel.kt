@@ -1,9 +1,14 @@
 package edu.uw.minh2804.rekognition.viewmodels
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
+import edu.uw.minh2804.rekognition.services.FirebaseEndpoint
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsCallback
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService
 import edu.uw.minh2804.rekognition.stores.Annotation
 import java.lang.Exception
 
@@ -12,6 +17,10 @@ enum class CameraState {
 }
 
 class CameraViewModel : ViewModel() {
+    private val _firebaseFunction = MutableLiveData<FirebaseEndpoint>()
+    val firebaseEndpoint: LiveData<FirebaseEndpoint>
+        get() = _firebaseFunction
+
     private val _cameraState = MutableLiveData<CameraState>()
     val cameraState: LiveData<CameraState>
         get() = _cameraState
@@ -27,6 +36,13 @@ class CameraViewModel : ViewModel() {
     private val _encounteredError = MutableLiveData<Exception>()
     val encounteredError: LiveData<Exception>
         get() = _encounteredError
+
+    fun onSetCameraTab(tabPosition: Int) {
+        when (tabPosition) {
+            0 -> _firebaseFunction.value = FirebaseEndpoint.TEXT
+            1 -> _firebaseFunction.value = FirebaseEndpoint.OBJECT
+        }
+    }
 
     fun onCameraCapturing() {
         _cameraState.value = CameraState.CAPTURING
