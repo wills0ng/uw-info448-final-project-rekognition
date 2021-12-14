@@ -1,6 +1,7 @@
 package edu.uw.minh2804.rekognition.services
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -8,6 +9,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import edu.uw.minh2804.rekognition.extensions.toString64
+import edu.uw.minh2804.rekognition.fragments.CameraOutputFragment
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -37,10 +39,6 @@ object FirebaseFunctionsService {
 
     suspend fun annotateImage(image: Bitmap): AnnotateImageResponse {
         return requestAnnotation("annotateImage", TextRecognitionRequest.createRequest(image.toString64()))
-    }
-
-    suspend fun labelImage(image: Bitmap): AnnotateImageResponse {
-        return requestAnnotation("labelImage", ObjectRecognitionRequest.createRequest(image.toString64()))
     }
 
     private suspend fun requestAnnotation(endpoint: String, body: JsonObject): AnnotateImageResponse {
