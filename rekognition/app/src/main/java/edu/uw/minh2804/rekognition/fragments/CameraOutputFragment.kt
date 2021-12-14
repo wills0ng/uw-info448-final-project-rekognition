@@ -16,6 +16,7 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.OnPermissionGrantedCallback
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
@@ -24,7 +25,7 @@ import kotlinx.coroutines.*
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
-    private var currentEndpoint: FirebaseFunctionsService.Endpoint = FirebaseFunctionsService.Endpoint.TEXT
+    private var currentEndpoint: Endpoint = Endpoint.TEXT
     private val scope = CoroutineScope(Dispatchers.Default)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,9 +63,9 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                             }
                             else -> {
                                 when (currentEndpoint) {
-                                    FirebaseFunctionsService.Endpoint.TEXT ->
+                                    Endpoint.TEXT ->
                                         displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "text"))
-                                    FirebaseFunctionsService.Endpoint.OBJECT ->
+                                    Endpoint.OBJECT ->
                                         displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "object"))
                                 }
                                 model.onImageAnnotateFailed()

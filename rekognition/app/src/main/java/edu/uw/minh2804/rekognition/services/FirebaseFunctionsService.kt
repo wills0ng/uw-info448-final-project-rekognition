@@ -13,7 +13,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-interface SuspendCallable { suspend fun apply(image: Bitmap): AnnotateImageResponse }
+interface SuspendCallable {
+//    val resultType: String
+    suspend fun apply(image: Bitmap): AnnotateImageResponse
+}
 
 data class Property(
     val name: String,
@@ -40,11 +43,13 @@ object FirebaseFunctionsService {
 
     enum class Endpoint : SuspendCallable {
         TEXT {
+//            override val resultType: String get() = getResources().getString()
             override suspend fun apply(image: Bitmap) = requestAnnotation(
                 "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
             )
         },
         OBJECT {
+//            override val resultType: String get() = "text"
             override suspend fun apply(image: Bitmap) = requestAnnotation(
                 "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
             )
