@@ -1,8 +1,6 @@
 package edu.uw.minh2804.rekognition.services
 
 import android.graphics.Bitmap
-import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
@@ -10,6 +8,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import edu.uw.minh2804.rekognition.extensions.toString64
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 data class Property(
     val name: String,
@@ -31,41 +32,28 @@ data class AnnotateImageResponse(
     val labelAnnotations: List<EntityAnnotation>
 )
 
-interface FirebaseFunctionsCallback {
-    fun onProcessed(annotation: AnnotateImageResponse)
-    fun onError(exception: Exception)
-}
-
 object FirebaseFunctionsService {
     private val functions = Firebase.functions
 
-    fun annotateImage(image: Bitmap, callback: FirebaseFunctionsCallback) {
-        callFunction("annotateImage", TextRecognitionRequest.createRequest(image.toString64()), callback)
+    suspend fun annotateImage(image: Bitmap): AnnotateImageResponse {
+        return requestAnnotation("annotateImage", TextRecognitionRequest.createRequest(image.toString64()))
     }
 
-    fun labelImage(image: Bitmap, callback: FirebaseFunctionsCallback) {
-        callFunction("labelImage", ObjectRecognitionRequest.createRequest(image.toString64()), callback)
+    suspend fun labelImage(image: Bitmap): AnnotateImageResponse {
+        return requestAnnotation("labelImage", ObjectRecognitionRequest.createRequest(image.toString64()))
     }
 
-    private fun callFunction(endpoint: String, body: JsonObject, callback: FirebaseFunctionsCallback) {
+    private suspend fun requestAnnotation(endpoint: String, body: JsonObject): AnnotateImageResponse {
         if (!FirebaseAuthService.isSignedIn()) {
-            callback.onError(FirebaseAuthService.UNAUTHORIZED_EXCEPTION)
-            return
+            FirebaseAuthService.signIn()
         }
-        val response = callFunction(endpoint, body)
-        response.addOnSuccessListener {
-            val result = Gson().fromJson(it.asJsonArray.first(), AnnotateImageResponse::class.java) // Deserialize Json into BatchAnnotateImagesResponse object
-            callback.onProcessed(result)
+        val result = suspendCoroutine<JsonElement> { continuation ->
+            functions
+                .getHttpsCallable(endpoint)
+                .call(body.toString())
+                .addOnSuccessListener { continuation.resume(JsonParser.parseString(Gson().toJson(it.data))) }
+                .addOnFailureListener { continuation.resumeWithException(it) }
         }
-        response.addOnFailureListener {
-            callback.onError(it)
-        }
-    }
-
-    private fun callFunction(endpoint: String, body: JsonObject): Task<JsonElement> {
-        return functions
-            .getHttpsCallable(endpoint)
-            .call(body.toString())
-            .continueWith { JsonParser.parseString(Gson().toJson(it.result?.data)) }
+        return Gson().fromJson(result.asJsonArray.first(), AnnotateImageResponse::class.java)
     }
 }

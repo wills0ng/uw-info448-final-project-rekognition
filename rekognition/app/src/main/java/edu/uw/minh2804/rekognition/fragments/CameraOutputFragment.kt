@@ -20,6 +20,7 @@ import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.coroutines.suspendCoroutine
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
@@ -47,24 +48,19 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     private fun observeCapturedPhoto(output: TextView) {
         model.capturedPhoto.observe(this) {
-            FirebaseFunctionsService.annotateImage(
-                it.thumbnail.bitmap,
-                object : FirebaseFunctionsCallback {
-                    override fun onProcessed(annotation: AnnotateImageResponse) {
-                        val result = annotation.fullTextAnnotation?.text
-                        if (result != null) {
-                            model.onImageAnnotated(Annotation(annotation))
-                        } else {
-                            model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_result_not_found)))
-                        }
+            lifecycleScope.launch {
+                try {
+                    val result = FirebaseFunctionsService.annotateImage(it.thumbnail.bitmap)
+                    if (result.fullTextAnnotation != null) {
+                        model.onImageAnnotated(Annotation(result))
+                    } else {
+                        model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_result_not_found)))
                     }
-
-                    override fun onError(exception: Exception) {
-                        Log.e(TAG, exception.toString())
-                        model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_internal_error)))
-                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.toString())
+                    model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_internal_error)))
                 }
-            )
+            }
         }
     }
 
@@ -104,12 +100,9 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 })
         }
         if (!FirebaseAuthService.isSignedIn()) {
-            FirebaseAuthService.signIn(object : OnSignedInCallback {
-                override fun onError(exception: java.lang.Exception) {
-                    Log.e(TAG, exception.toString())
-                    requireActivity().finish()
-                }
-            })
+            lifecycleScope.launch {
+                FirebaseAuthService.signIn()
+            }
         }
     }
 
