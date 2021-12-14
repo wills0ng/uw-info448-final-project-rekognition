@@ -50,7 +50,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener(Runnable
-        { displayCameraFeed(cameraProviderFuture.get()) },
+            { displayCameraFeed(cameraProviderFuture.get()) },
             ContextCompat.getMainExecutor(requireContext())
         )
     }

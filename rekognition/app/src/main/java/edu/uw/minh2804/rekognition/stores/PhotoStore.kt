@@ -1,10 +1,13 @@
 package edu.uw.minh2804.rekognition.stores
 
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class Photo(val file: File)
 
@@ -21,15 +24,19 @@ class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
             SavedItem(it.nameWithoutExtension, Photo(it))
         }
 
-    override fun findItem(id: String): SavedItem<Photo>? {
-        val file = directory.listFiles()!!.firstOrNull {
-            it.nameWithoutExtension == id
-        } ?: return null
-        return SavedItem(id, Photo(file))
+    override suspend fun findItem(id: String): SavedItem<Photo>? {
+        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+            val file = directory.listFiles()!!.firstOrNull {
+                it.nameWithoutExtension == id
+            }
+            if (file != null) SavedItem(id, Photo(file)) else null
+        }
     }
 
-    override fun save(id: String, item: Photo): SavedItem<Photo> {
-        return SavedItem(id, item)
+    override suspend fun save(id: String, item: Photo): SavedItem<Photo> {
+        return withContext(context.lifecycleScope.coroutineContext) {
+            SavedItem(id, item)
+        }
     }
 
     fun createOutputFile(): File {

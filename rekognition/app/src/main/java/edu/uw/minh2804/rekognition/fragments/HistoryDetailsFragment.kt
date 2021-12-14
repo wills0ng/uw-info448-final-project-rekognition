@@ -5,10 +5,10 @@ package edu.uw.minh2804.rekognition.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryDetailsBinding

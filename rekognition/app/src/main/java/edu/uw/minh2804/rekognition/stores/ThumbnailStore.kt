@@ -4,7 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.graphics.scale
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class Thumbnail(file: File) {
@@ -23,18 +26,22 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
             SavedItem(it.nameWithoutExtension, Thumbnail(it))
         }
 
-    override fun findItem(id: String): SavedItem<Thumbnail>? {
-        val file = directory.listFiles()!!.firstOrNull {
-            it.nameWithoutExtension == id
+    override suspend fun findItem(id: String): SavedItem<Thumbnail>? {
+        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+            val file = directory.listFiles()!!.firstOrNull {
+                it.nameWithoutExtension == id
+            }
+            if (file != null) SavedItem(file.nameWithoutExtension, Thumbnail(file)) else null
         }
-        return if (file != null) SavedItem(file.nameWithoutExtension, Thumbnail(file)) else null
     }
 
-    override fun save(id: String, item: Thumbnail): SavedItem<Thumbnail> {
-        File(directory, "$id.jpg").let {
-            item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
+    override suspend fun save(id: String, item: Thumbnail): SavedItem<Thumbnail> {
+        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+            File(directory, "$id.jpg").let {
+                item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
+            }
+            SavedItem(id, item)
         }
-        return SavedItem(id, item)
     }
 }
 

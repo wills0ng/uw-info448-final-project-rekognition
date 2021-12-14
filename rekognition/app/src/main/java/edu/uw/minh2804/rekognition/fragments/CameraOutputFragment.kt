@@ -18,83 +18,68 @@ import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
-    private var currentEndpoint: FirebaseEndpoint = FirebaseEndpoint.TEXT
+    private var currentEndpoint: FirebaseFunctionsService.Endpoint = FirebaseFunctionsService.Endpoint.TEXT
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireFirebaseOrShutdown()
 
-        val output = view.findViewById<TextView>(R.id.text_output_overlay)
+        val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
 
         model.firebaseEndpoint.observe(this) {
             Log.v(TAG, "Changing endpoint to: $it")
             currentEndpoint = it
         }
 
-        observeCameraState(output)
-        observeCapturedPhoto(output)
-        observeEncounteredError(output)
-        observeImageAnnotation(output)
-    }
-
-    private fun observeCameraState(output: TextView) {
         model.cameraState.observe(this) {
             if (it == CameraState.CAPTURING) {
-                output.text = getString(R.string.camera_output_on_processing)
-                output.visibility = View.VISIBLE
+                outputView.text = getString(R.string.camera_output_on_processing)
+                displayViewInXDuration(outputView)
             }
         }
-    }
 
-    private fun observeCapturedPhoto(output: TextView) {
         model.capturedPhoto.observe(this) {
-            currentEndpoint.apply(
-                it.thumbnail.bitmap,
-                object : FirebaseFunctionsCallback {
-                    override fun onProcessed(annotation: AnnotateImageResponse) {
-                        val result = annotation.fullTextAnnotation?.text
-                        if (result != null) {
-                            model.onImageAnnotated(Annotation(annotation))
-                        } else {
-                            model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_result_not_found)))
-                        }
+            lifecycleScope.launch {
+                try {
+                    val result = currentEndpoint.apply(it.thumbnail.bitmap)
+                    if (result.fullTextAnnotation != null) {
+                        model.onImageAnnotated(Annotation(result))
+                    } else {
+                        model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_result_not_found)))
                     }
-
-                    override fun onError(exception: Exception) {
-                        Log.e(TAG, exception.toString())
-                        model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_internal_error)))
-                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, e.toString())
+                    model.onImageAnnotateFailed(Exception(getString(R.string.camera_output_internal_error)))
                 }
-            )
-        }
-    }
-
-    private fun observeEncounteredError(output: TextView) {
-        model.encounteredError.observe(this) {
-            output.text = it.message!!
-            output.visibility = View.VISIBLE
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
-                output.visibility = View.INVISIBLE
             }
         }
-    }
 
-    private fun observeImageAnnotation(output: TextView) {
+        model.encounteredError.observe(this) {
+            outputView.text = it.message!!
+            displayViewInXDuration(outputView)
+        }
+
         model.imageAnnotation.observe(this) {
             if (it != null) {
-                output.text = it.result.fullTextAnnotation!!.text
-                output.visibility = View.VISIBLE
-                viewLifecycleOwner.lifecycleScope.launch {
-                    delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
-                    output.visibility = View.INVISIBLE
-                }
+                outputView.text = it.result.fullTextAnnotation!!.text
+                displayViewInXDuration(outputView)
             }
+        }
+    }
+
+    private fun displayViewInXDuration(view: TextView) {
+        // displayViewInXDuration could be previously called and the delay haven't elapsed yet,
+        // so cancelling the previous call is needed to reset the clock.
+        scope.coroutineContext.cancelChildren()
+        view.visibility = View.VISIBLE
+        scope.launch {
+            delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS.toLong())
+            view.visibility = View.INVISIBLE
         }
     }
 
@@ -110,13 +95,15 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 })
         }
         if (!FirebaseAuthService.isSignedIn()) {
-            FirebaseAuthService.signIn(object : OnSignedInCallback {
-                override fun onError(exception: java.lang.Exception) {
-                    Log.e(TAG, exception.toString())
-                    requireActivity().finish()
-                }
-            })
+            lifecycleScope.launch {
+                FirebaseAuthService.signIn()
+            }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scope.cancel()
     }
 
     companion object {

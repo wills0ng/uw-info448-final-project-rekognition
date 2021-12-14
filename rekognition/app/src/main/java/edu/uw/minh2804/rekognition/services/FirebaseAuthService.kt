@@ -1,22 +1,22 @@
 package edu.uw.minh2804.rekognition.services
 
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.lang.Exception
-
-interface OnSignedInCallback {
-    fun onSignedIn() {}
-    fun onError(exception: Exception) {}
-}
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object FirebaseAuthService {
     private val AUTH = Firebase.auth
-    val UNAUTHORIZED_EXCEPTION = Exception("User is not signed into Firebase")
 
-    fun signIn(callback: OnSignedInCallback) {
-        AUTH.signInAnonymously()
-            .addOnSuccessListener { callback.onSignedIn() }
-            .addOnFailureListener { callback.onError(it) }
+    suspend fun signIn(): AuthResult {
+        return suspendCoroutine { continuation ->
+            AUTH.signInAnonymously()
+                .addOnSuccessListener { continuation.resume(it) }
+                .addOnFailureListener { continuation.resumeWithException(it) }
+        }
     }
 
     fun isSignedIn(): Boolean {

@@ -6,19 +6,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
-import edu.uw.minh2804.rekognition.services.FirebaseEndpoint
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsCallback
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 import edu.uw.minh2804.rekognition.stores.Annotation
 import java.lang.Exception
 
 enum class CameraState {
-    IDLE, CAPTURING, CAPTURED
+    CAPTURING, CAPTURED, IDLE
 }
 
 class CameraViewModel : ViewModel() {
-    private val _firebaseFunction = MutableLiveData<FirebaseEndpoint>()
-    val firebaseEndpoint: LiveData<FirebaseEndpoint>
+    private val _firebaseFunction = MutableLiveData<Endpoint>()
+    val firebaseEndpoint: LiveData<Endpoint>
         get() = _firebaseFunction
 
     private val _cameraState = MutableLiveData<CameraState>()
@@ -39,8 +37,8 @@ class CameraViewModel : ViewModel() {
 
     fun onSetCameraTab(tabPosition: Int) {
         when (tabPosition) {
-            0 -> _firebaseFunction.value = FirebaseEndpoint.TEXT
-            1 -> _firebaseFunction.value = FirebaseEndpoint.OBJECT
+            0 -> _firebaseFunction.value = Endpoint.TEXT
+            1 -> _firebaseFunction.value = Endpoint.OBJECT
         }
     }
 
@@ -49,23 +47,23 @@ class CameraViewModel : ViewModel() {
     }
 
     fun onCameraCaptured(photo: CameraOutput) {
-        _capturedPhoto.value = photo
         _cameraState.value = CameraState.CAPTURED
+        _capturedPhoto.value = photo
     }
 
     fun onCameraCaptureFailed(exception: Exception) {
-        _encounteredError.value = exception
         _cameraState.value = CameraState.IDLE
+        _encounteredError.value = exception
     }
 
     fun onImageAnnotated(output: Annotation) {
-        _imageAnnotation.value = output
         _cameraState.value = CameraState.IDLE
+        _imageAnnotation.value = output
     }
 
     fun onImageAnnotateFailed(exception: Exception) {
+        _cameraState.value = CameraState.IDLE
         _imageAnnotation.value = null
         _encounteredError.value = exception
-        _cameraState.value = CameraState.IDLE
     }
 }

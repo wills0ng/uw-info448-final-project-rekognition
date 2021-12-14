@@ -7,7 +7,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class HistoryItem (
-    val image: Uri,
-    val text: String
-) : Parcelable
+data class HistoryItem (val image: Uri, val text: String) : Parcelable
