@@ -13,8 +13,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
-import edu.uw.minh2804.rekognition.extensions.OnPermissionGrantedCallback
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
 import edu.uw.minh2804.rekognition.services.*
@@ -23,6 +23,7 @@ import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlinx.coroutines.launch
 
 class CameraOutput(file: File) {
     val photo = Photo(file)
@@ -66,8 +67,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
             // Bind use cases to camera
             provider.bindToLifecycle(this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
-        } catch(exception: Exception) {
-            Log.e(TAG, "Use case binding failed", exception)
+        } catch(e: Exception) {
+            Log.e(TAG, "Use case binding failed", e)
         }
     }
 
@@ -87,28 +88,26 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     model.onCameraCaptured(CameraOutput(outputFile))
                 }
 
-                override fun onError(exception: ImageCaptureException) {
-                    Log.e(TAG, "Photo save failed: ${exception.message}", exception)
-                    model.onCameraCaptureFailed(Exception(getString(R.string.camera_output_internal_error)))
+                override fun onError(e: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${e.message}", e)
+                    model.onCameraCaptureFailed()
                 }
             }
         )
     }
 
     private fun requireCameraOrShutdown() {
-        val requiredPermission = Manifest.permission.CAMERA
-        if (requireActivity().isPermissionGranted(requiredPermission)) {
-            startCamera()
-        } else {
-            requireActivity().requestPermission(requiredPermission, object : OnPermissionGrantedCallback {
-                override fun onPermissionGranted() {
+        lifecycleScope.launch {
+            val requiredPermission = Manifest.permission.CAMERA
+            if (requireActivity().isPermissionGranted(requiredPermission)) {
+                startCamera()
+            } else {
+                if (requireActivity().requestPermission(requiredPermission)) {
                     startCamera()
-                }
-
-                override fun onPermissionDenied() {
+                } else {
                     requireActivity().finish()
                 }
-            })
+            }
         }
     }
 

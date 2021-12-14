@@ -41,6 +41,7 @@ data class AnnotateImageResponse(
 )
 
 object FirebaseFunctionsService {
+    private const val TAG = "FirebaseFunctionsService"
     private val functions = Firebase.functions
 
     enum class Endpoint : Annotator {
@@ -60,7 +61,9 @@ object FirebaseFunctionsService {
                 return context.getString(R.string.camera_image_labeling)
             }
             override fun formatResult(result: AnnotateImageResponse): String? {
-                return result.fullTextAnnotation?.text
+                return if (result.labelAnnotations.any()) {
+                    result.labelAnnotations.joinToString { it.description }
+                } else null
             }
             override suspend fun annotate(image: Bitmap) = requestAnnotation(
                 "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())

@@ -7,6 +7,7 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.services.AnnotateImageResponse
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 data class Annotation(val result: AnnotateImageResponse)
@@ -33,7 +34,7 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
     }
 
     override suspend fun save(id: String, item: Annotation): SavedItem<Annotation> {
-        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+        return withContext(NonCancellable + Dispatchers.IO) {
             File(directory, "$id.json").also {
                 it.writeText(Gson().toJson(item))
             }
