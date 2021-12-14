@@ -49,12 +49,18 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 try {
                     withTimeout(1000 * seconds) {
                         val result = currentEndpoint.apply(it.thumbnail.bitmap)
-                        if (result.fullTextAnnotation != null) {
-                            displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
-                            model.onImageAnnotated(Annotation(result))
-                        } else {
-                            displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
-                            model.onImageAnnotateFailed()
+                        when {
+                            result.fullTextAnnotation != null -> {
+                                displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
+                                model.onImageAnnotated(Annotation(result))
+                            }
+                            result.labelAnnotations != null -> {
+                                displayViewInFixedDuration(outputView, result.labelAnnotations[0].description)
+                            }
+                            else -> {
+                                displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
+                                model.onImageAnnotateFailed()
+                            }
                         }
                     }
                 } catch (e: Exception) {

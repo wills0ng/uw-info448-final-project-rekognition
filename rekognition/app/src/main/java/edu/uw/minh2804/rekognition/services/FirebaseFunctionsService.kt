@@ -13,7 +13,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-interface SimpleCallable { suspend fun apply(image: Bitmap): AnnotateImageResponse }
+interface SuspendCallable { suspend fun apply(image: Bitmap): AnnotateImageResponse }
 
 data class Property(
     val name: String,
@@ -21,7 +21,7 @@ data class Property(
 )
 
 data class EntityAnnotation(
-    val properties: List<Property>,
+    val description: String,
     val score: Double
 )
 
@@ -32,13 +32,13 @@ data class TextAnnotation(
 // See more: https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#textannotation
 data class AnnotateImageResponse(
     val fullTextAnnotation: TextAnnotation?,
-    val labelAnnotations: List<EntityAnnotation>
+    val labelAnnotations: List<EntityAnnotation>?
 )
 
 object FirebaseFunctionsService {
     private val functions = Firebase.functions
 
-    enum class Endpoint : SimpleCallable {
+    enum class Endpoint : SuspendCallable {
         TEXT {
             override suspend fun apply(image: Bitmap) = requestAnnotation(
                 "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
@@ -59,7 +59,9 @@ object FirebaseFunctionsService {
             functions
                 .getHttpsCallable(endpoint)
                 .call(body.toString())
-                .addOnSuccessListener { continuation.resume(JsonParser.parseString(Gson().toJson(it.data))) }
+                .addOnSuccessListener {
+                    continuation.resume(JsonParser.parseString(Gson().toJson(it.data)))
+                }
                 .addOnFailureListener { continuation.resumeWithException(it) }
         }
         return Gson().fromJson(result.asJsonArray.first(), AnnotateImageResponse::class.java)
