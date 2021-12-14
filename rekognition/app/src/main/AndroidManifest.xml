@@ -16,9 +16,7 @@
         android:theme="@style/Theme.Rekognition.NoActionBar">
         <activity
             android:name=".HistoryActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Rekognition.NoActionBar"
-            android:parentActivityName=".MainActivity" />
+            android:exported="false" />
         <activity
             android:name=".CameraActivity"
             android:exported="false" />

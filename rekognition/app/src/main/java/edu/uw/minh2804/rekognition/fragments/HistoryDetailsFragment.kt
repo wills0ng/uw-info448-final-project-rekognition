@@ -8,7 +8,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryDetailsBinding
@@ -31,12 +33,6 @@ class HistoryDetailsFragment : Fragment() {
         val item = HistoryDetailsFragmentArgs.fromBundle(requireArguments()).item
         Log.v(TAG,"The info passed in was $item")
         binding.item = item
-
-        // Add up navigation to toolbar
-        binding.toolbarHistoryDetails.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
-        binding.toolbarHistoryDetails.setNavigationOnClickListener {
-            requireActivity().onNavigateUp()
-        }
 
         // Set click listener for the floating action button to go from history to camera
         binding.fabHistoryDetailsToCamera.setOnClickListener {

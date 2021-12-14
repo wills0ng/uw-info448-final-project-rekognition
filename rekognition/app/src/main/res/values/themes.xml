@@ -23,6 +23,10 @@
 
     <style name="Theme.Rekognition.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
+    </style>
+
     <style name="Toolbar.TitleText" parent="TextAppearance.AppCompat.Title">
         <item name="android:textSize">28sp</item>
     </style>

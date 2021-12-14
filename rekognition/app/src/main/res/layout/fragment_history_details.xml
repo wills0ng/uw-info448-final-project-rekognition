@@ -20,14 +20,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_historyDetails"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                app:title="Details"
-                android:background="@color/purple_500"
-                app:titleTextColor="@color/white" />
-
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
