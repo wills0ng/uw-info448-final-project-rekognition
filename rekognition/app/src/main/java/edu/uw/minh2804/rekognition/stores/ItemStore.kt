@@ -6,7 +6,7 @@ data class SavedItem<T>(
 )
 
 interface ItemStore<T> {
-    val items: List<SavedItem<T>>
+    val items: List<Lazy<SavedItem<T>>>
     suspend fun findItem(id: String): SavedItem<T>?
     suspend fun save(id: String, item: T): SavedItem<T>
 }

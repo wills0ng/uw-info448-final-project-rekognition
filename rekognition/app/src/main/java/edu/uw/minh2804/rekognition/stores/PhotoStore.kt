@@ -19,9 +19,9 @@ class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
         if (mediaDir != null && mediaDir.exists()) mediaDir else context.filesDir
     }
 
-    override val items: List<SavedItem<Photo>>
+    override val items: List<Lazy<SavedItem<Photo>>>
         get() = directory.listFiles()!!.map {
-            SavedItem(it.nameWithoutExtension, Photo(it))
+            lazy { SavedItem(it.nameWithoutExtension, Photo(it)) }
         }
 
     override suspend fun findItem(id: String): SavedItem<Photo>? {
