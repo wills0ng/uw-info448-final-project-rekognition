@@ -12,7 +12,7 @@ import kotlinx.coroutines.withContext
 data class Photo(val file: File)
 
 class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
-    val directory: File by lazy {
+    private val directory: File by lazy {
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let { appDirectory ->
             File(appDirectory, context.resources.getString(R.string.app_name)).also { it.mkdirs() }
         }

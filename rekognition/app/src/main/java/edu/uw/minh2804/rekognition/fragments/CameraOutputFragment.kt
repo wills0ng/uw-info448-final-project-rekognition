@@ -3,6 +3,8 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -55,7 +57,8 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                                 model.onImageAnnotated(Annotation(result))
                             }
                             result.labelAnnotations != null -> {
-                                displayViewInFixedDuration(outputView, result.labelAnnotations[0].description)
+                                displayViewInFixedDuration(outputView, result.labelAnnotations.first().description)
+                                model.onImageAnnotated(Annotation(result))
                             }
                             else -> {
                                 displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))

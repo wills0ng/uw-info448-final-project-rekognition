@@ -1,10 +1,8 @@
 package edu.uw.minh2804.rekognition.viewmodels
 
-import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import edu.uw.minh2804.rekognition.CameraActivity
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
 import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 import edu.uw.minh2804.rekognition.stores.Annotation

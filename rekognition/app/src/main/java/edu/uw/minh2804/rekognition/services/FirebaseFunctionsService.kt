@@ -64,6 +64,7 @@ object FirebaseFunctionsService {
                 }
                 .addOnFailureListener { continuation.resumeWithException(it) }
         }
+        Log.v("TEST", result.toString())
         return Gson().fromJson(result.asJsonArray.first(), AnnotateImageResponse::class.java)
     }
 }
