@@ -23,7 +23,7 @@ import kotlinx.coroutines.*
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
-    private var currentEndpoint: FirebaseFunctionsService.Endpoint = FirebaseFunctionsService.Endpoint.TEXT
+    private var currentEndpoint: AnnotationCallback = FirebaseFunctionsService.TextDetection
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -51,27 +51,16 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 try {
                     // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
                     withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
-                        val result = currentEndpoint.apply(it.thumbnail.bitmap)
-                        when {
-                            result.fullTextAnnotation != null -> {
-                                displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
-                                annotationStore.save(id, Annotation(result))
-                                model.onImageAnnotated()
-                            }
-                            result.labelAnnotations.any() -> {
-                                displayViewInFixedDuration(outputView, result.labelAnnotations.joinToString { it.description })
-                                annotationStore.save(id, Annotation(result))
-                                model.onImageAnnotated()
-                            }
-                            else -> {
-                                when (currentEndpoint) {
-                                    FirebaseFunctionsService.Endpoint.TEXT ->
-                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "text"))
-                                    FirebaseFunctionsService.Endpoint.OBJECT ->
-                                        displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found, "object"))
-                                }
-                                model.onImageAnnotateFailed()
-                            }
+                        val result = currentEndpoint.requestAnnotation(it.thumbnail.bitmap)
+                        val resultToDisplay = currentEndpoint.onResultReceived(result)
+                        if (resultToDisplay != null) {
+                            displayViewInFixedDuration(outputView, resultToDisplay)
+                            annotationStore.save(id, Annotation(result))
+                            model.onImageAnnotated()
+                        } else {
+                            val errorToDisplay = currentEndpoint.onResultNotFound(requireContext())
+                            displayViewInFixedDuration(outputView, errorToDisplay)
+                            model.onImageAnnotateFailed()
                         }
                     }
                 } catch (e: Exception) {

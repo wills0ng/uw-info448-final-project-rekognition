@@ -1,5 +1,6 @@
 package edu.uw.minh2804.rekognition.services
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.functions.ktx.functions
@@ -8,12 +9,13 @@ import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.toString64
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-interface SuspendCallable { suspend fun apply(image: Bitmap): AnnotateImageResponse }
+interface SuspendCallable { suspend fun requestAnnotation(image: Bitmap): AnnotateImageResponse }
 
 data class Property(
     val name: String,
@@ -35,19 +37,41 @@ data class AnnotateImageResponse(
     val labelAnnotations: List<EntityAnnotation>
 )
 
+interface AnnotationCallback {
+    fun onResultNotFound(context: Context): String
+    fun onResultReceived(result: AnnotateImageResponse): String?
+    suspend fun requestAnnotation(image: Bitmap): AnnotateImageResponse
+}
+
 object FirebaseFunctionsService {
+    private const val TAG = "FirebaseFunctionsService"
     private val functions = Firebase.functions
 
-    enum class Endpoint : SuspendCallable {
-        TEXT {
-            override suspend fun apply(image: Bitmap) = requestAnnotation(
-                "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
-            )
-        },
-        OBJECT {
-            override suspend fun apply(image: Bitmap) = requestAnnotation(
-                "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
-            )
+    object TextDetection : AnnotationCallback {
+        override suspend fun requestAnnotation(image: Bitmap) = requestAnnotation(
+            "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
+        )
+
+        override fun onResultReceived(result: AnnotateImageResponse): String? {
+            return result.fullTextAnnotation?.text
+        }
+
+        override fun onResultNotFound(context: Context): String {
+            return context.getString(R.string.camera_output_text_not_found)
+        }
+    }
+
+    object ObjectDetection : AnnotationCallback {
+        override suspend fun requestAnnotation(image: Bitmap) = requestAnnotation(
+            "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
+        )
+
+        override fun onResultReceived(result: AnnotateImageResponse): String? {
+            return if (result.labelAnnotations.any()) result.labelAnnotations.joinToString { it.description } else null
+        }
+
+        override fun onResultNotFound(context: Context): String {
+            return context.getString(R.string.camera_output_object_not_found)
         }
     }
 

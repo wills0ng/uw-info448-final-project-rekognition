@@ -23,13 +23,9 @@ class CameraActivity : ActionBarActivity(R.layout.activity_camera) {
                     model.onSetCameraTab(tabPosition = tab.position)
                 }
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, "${tab!!.text.toString()} tab reselected")
-                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, "${tab!!.text.toString()} tab unselected")
-                }
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
             }
         )
 
