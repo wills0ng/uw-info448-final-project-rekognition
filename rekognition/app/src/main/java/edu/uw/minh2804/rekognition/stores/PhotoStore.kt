@@ -34,9 +34,7 @@ class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
     }
 
     override suspend fun save(id: String, item: Photo): SavedItem<Photo> {
-        return withContext(context.lifecycleScope.coroutineContext) {
-            SavedItem(id, item)
-        }
+        return withContext(context.lifecycleScope.coroutineContext) { SavedItem(id, item) }
     }
 
     fun createOutputFile(): File {

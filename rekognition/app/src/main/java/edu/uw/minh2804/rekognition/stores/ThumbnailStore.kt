@@ -10,6 +10,7 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.scaleDown
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 class Thumbnail(file: File) {
@@ -44,7 +45,7 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
     }
 
     override suspend fun save(id: String, item: Thumbnail): SavedItem<Thumbnail> {
-        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+        return withContext(NonCancellable + Dispatchers.IO) {
             File(directory, "$id.jpg").let {
                 item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
                 // Save thumbnail with exif data containing original image orientation

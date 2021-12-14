@@ -3,8 +3,6 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,24 +11,26 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
-import edu.uw.minh2804.rekognition.extensions.OnPermissionGrantedCallback
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
 import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.Annotation
+import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
+    private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
     private var currentEndpoint: FirebaseFunctionsService.Endpoint = FirebaseFunctionsService.Endpoint.TEXT
-    private val scope = CoroutineScope(Dispatchers.Default)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         requireFirebaseOrShutdown()
 
+        val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
 
         model.firebaseEndpoint.observe(this) {
@@ -46,19 +46,22 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         }
 
         model.capturedPhoto.observe(this) {
-            val seconds = 10L
             lifecycleScope.launch {
+                val id = it.photo.file.nameWithoutExtension
                 try {
-                    withTimeout(1000 * seconds) {
+                    // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
+                    withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
                         val result = currentEndpoint.apply(it.thumbnail.bitmap)
                         when {
                             result.fullTextAnnotation != null -> {
                                 displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
-                                model.onImageAnnotated(Annotation(result))
+                                annotationStore.save(id, Annotation(result))
+                                model.onImageAnnotated()
                             }
                             result.labelAnnotations.any() -> {
-                                displayViewInFixedDuration(outputView, result.labelAnnotations.first().description)
-                                model.onImageAnnotated(Annotation(result))
+                                displayViewInFixedDuration(outputView, result.labelAnnotations.joinToString { it.description })
+                                annotationStore.save(id, Annotation(result))
+                                model.onImageAnnotated()
                             }
                             else -> {
                                 displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
@@ -76,30 +79,26 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     }
 
     private fun displayViewInFixedDuration(view: TextView, output: String) {
-        // displayViewInXDuration could be previously called and the delay haven't elapsed yet,
+        // displayViewInFixedDuration could be previously called and the delay haven't elapsed yet,
         // so cancelling the previous call is needed to reset the clock.
-        scope.coroutineContext.cancelChildren()
+        viewVisibilityScope.coroutineContext.cancelChildren()
         view.text = output
         view.visibility = View.VISIBLE
-        scope.launch {
-            delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS)
+        viewVisibilityScope.launch {
+            delay(1000 * VIEW_VISIBILITY_DURATION_IN_SECONDS)
             view.visibility = View.INVISIBLE
         }
     }
 
     private fun requireFirebaseOrShutdown() {
-        val requiredPermission = Manifest.permission.INTERNET
-        if (!requireActivity().isPermissionGranted(requiredPermission)) {
-            requireActivity().requestPermission(
-                requiredPermission,
-                object : OnPermissionGrantedCallback {
-                    override fun onPermissionDenied() {
-                        requireActivity().finish()
-                    }
-                })
-        }
-        if (!FirebaseAuthService.isSignedIn()) {
-            lifecycleScope.launch {
+        lifecycleScope.launch {
+            val requiredPermission = Manifest.permission.INTERNET
+            if (!requireActivity().isPermissionGranted(requiredPermission)) {
+                if (!requireActivity().requestPermission(requiredPermission)) {
+                    requireActivity().finish()
+                }
+            }
+            if (!FirebaseAuthService.isSignedIn()) {
                 FirebaseAuthService.signIn()
             }
         }
@@ -107,11 +106,12 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        scope.cancel()
+        viewVisibilityScope.cancel()
     }
 
     companion object {
-        const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5L
+        const val CONNECTION_TIMEOUT_IN_SECONDS = 10L
+        const val VIEW_VISIBILITY_DURATION_IN_SECONDS = 5L
         private const val TAG = "CameraOutputFragment"
     }
 }

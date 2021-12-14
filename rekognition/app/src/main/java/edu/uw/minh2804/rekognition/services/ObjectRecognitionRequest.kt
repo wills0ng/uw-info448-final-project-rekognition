@@ -7,7 +7,7 @@ import com.google.gson.JsonPrimitive
 object ObjectRecognitionRequest {
     private val feature = JsonObject().also {
         it.add("type", JsonPrimitive("LABEL_DETECTION"))
-        it.add("maxResults", JsonPrimitive(1))
+        it.add("maxResults", JsonPrimitive(3))
     }
     private val features = JsonArray().also { it.add(feature) }
 

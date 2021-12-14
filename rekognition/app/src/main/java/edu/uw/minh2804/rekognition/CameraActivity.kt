@@ -7,7 +7,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import edu.uw.minh2804.rekognition.stores.*
-import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.launch
 
@@ -34,31 +33,19 @@ class CameraActivity : ActionBarActivity(R.layout.activity_camera) {
             }
         )
 
-        val annotationStore = AnnotationStore(this)
         val photoStore = PhotoStore(this)
         val thumbnailStore = ThumbnailStore(this)
 
-        @Suppress("DeferredResultUnused")
         model.capturedPhoto.observe(this, Observer {
             val id = it.photo.file.nameWithoutExtension
 
             lifecycleScope.launch {
                 photoStore.save(id, it.photo)
-                thumbnailStore.save(id, it.thumbnail)
             }
 
-            // This observer will only observe and only invoke once
-            val imageAnnotationObserver = object : Observer<Annotation?> {
-                override fun onChanged(response: Annotation?) {
-                    if (response != null) {
-                        lifecycleScope.launch {
-                            annotationStore.save(id, response)
-                        }
-                        model.imageAnnotation.removeObserver(this)
-                    }
-                }
+            lifecycleScope.launch {
+                thumbnailStore.save(id, it.thumbnail)
             }
-            model.imageAnnotation.observe(this, imageAnnotationObserver)
         })
     }
 
