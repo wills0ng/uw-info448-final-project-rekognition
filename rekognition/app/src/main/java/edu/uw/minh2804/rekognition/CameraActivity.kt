@@ -54,8 +54,8 @@ class CameraActivity : ActionBarActivity(R.layout.activity_camera) {
                         lifecycleScope.launch {
                             annotationStore.save(id, response)
                         }
+                        model.imageAnnotation.removeObserver(this)
                     }
-                    model.imageAnnotation.removeObserver(this)
                 }
             }
             model.imageAnnotation.observe(this, imageAnnotationObserver)

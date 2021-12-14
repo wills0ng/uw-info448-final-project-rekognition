@@ -21,6 +21,7 @@ data class Property(
 )
 
 data class EntityAnnotation(
+    val description: String,
     val properties: List<Property>,
     val score: Double
 )
@@ -62,6 +63,7 @@ object FirebaseFunctionsService {
                 .addOnSuccessListener { continuation.resume(JsonParser.parseString(Gson().toJson(it.data))) }
                 .addOnFailureListener { continuation.resumeWithException(it) }
         }
+        Log.v("TEST", result.toString())
         return Gson().fromJson(result.asJsonArray.first(), AnnotateImageResponse::class.java)
     }
 }

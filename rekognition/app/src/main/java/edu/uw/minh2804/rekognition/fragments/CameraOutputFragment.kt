@@ -3,6 +3,8 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -49,12 +51,25 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                 try {
                     withTimeout(1000 * seconds) {
                         val result = currentEndpoint.apply(it.thumbnail.bitmap)
-                        if (result.fullTextAnnotation != null) {
-                            displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
-                            model.onImageAnnotated(Annotation(result))
-                        } else {
-                            displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
-                            model.onImageAnnotateFailed()
+                        when(currentEndpoint) {
+                            FirebaseFunctionsService.Endpoint.TEXT -> {
+                                if (result.fullTextAnnotation != null) {
+                                    displayViewInFixedDuration(outputView, result.fullTextAnnotation.text)
+                                    model.onImageAnnotated(Annotation(result))
+                                } else {
+                                    displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
+                                    model.onImageAnnotateFailed()
+                                }
+                            }
+                            FirebaseFunctionsService.Endpoint.OBJECT -> {
+                                if (result.labelAnnotations.any()) {
+                                    displayViewInFixedDuration(outputView, result.labelAnnotations.first().description)
+                                    model.onImageAnnotated(Annotation(result))
+                                } else {
+                                    displayViewInFixedDuration(outputView, getString(R.string.camera_output_result_not_found))
+                                    model.onImageAnnotateFailed()
+                                }
+                            }
                         }
                     }
                 } catch (e: Exception) {
