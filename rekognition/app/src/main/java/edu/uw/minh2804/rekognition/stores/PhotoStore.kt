@@ -1,10 +1,14 @@
 package edu.uw.minh2804.rekognition.stores
 
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 data class Photo(val file: File)
 
@@ -30,6 +34,12 @@ class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
 
     override fun save(id: String, item: Photo): SavedItem<Photo> {
         return SavedItem(id, item)
+    }
+
+    override fun saveAsync(id: String, item: Photo): Deferred<SavedItem<Photo>> {
+        return context.lifecycleScope.async(Dispatchers.IO) {
+            save(id, item)
+        }
     }
 
     fun createOutputFile(): File {

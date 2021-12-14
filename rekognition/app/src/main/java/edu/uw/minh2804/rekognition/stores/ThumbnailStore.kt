@@ -4,8 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.core.graphics.scale
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
 import java.io.File
+import kotlinx.coroutines.*
 
 class Thumbnail(file: File) {
     val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scale(ThumbnailSetting.MAX_WIDTH, ThumbnailSetting.MAX_HEIGHT)
@@ -35,6 +37,12 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
             item.bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it.outputStream())
         }
         return SavedItem(id, item)
+    }
+
+    override fun saveAsync(id: String, item: Thumbnail): Deferred<SavedItem<Thumbnail>> {
+        return context.lifecycleScope.async(Dispatchers.IO) {
+            save(id, item)
+        }
     }
 }
 

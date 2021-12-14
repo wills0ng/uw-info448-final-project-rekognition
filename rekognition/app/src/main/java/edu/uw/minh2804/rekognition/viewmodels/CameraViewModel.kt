@@ -8,7 +8,7 @@ import edu.uw.minh2804.rekognition.stores.Annotation
 import java.lang.Exception
 
 enum class CameraState {
-    IDLE, CAPTURING, CAPTURED
+    CAPTURING, CAPTURED, IDLE
 }
 
 class CameraViewModel : ViewModel() {

@@ -1,10 +1,14 @@
 package edu.uw.minh2804.rekognition.stores
 
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.services.AnnotateImageResponse
 import java.io.File
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 
 data class Annotation(val result: AnnotateImageResponse)
 
@@ -32,6 +36,12 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
             it.writeText(Gson().toJson(item))
         }
         return SavedItem(id, item)
+    }
+
+    override fun saveAsync(id: String, item: Annotation): Deferred<SavedItem<Annotation>> {
+        return context.lifecycleScope.async(Dispatchers.IO) {
+            save(id, item)
+        }
     }
 
     private fun readAnnotationFrom(file: File): SavedItem<Annotation> {
