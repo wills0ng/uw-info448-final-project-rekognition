@@ -44,6 +44,15 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
         }
     }
 
+    suspend fun getUri(id: String): Uri? {
+        return withContext(context.lifecycleScope.coroutineContext + Dispatchers.IO) {
+            val file = directory.listFiles()!!.firstOrNull {
+                it.nameWithoutExtension == id
+            }
+            if (file != null) Uri.fromFile(file) else null
+        }
+    }
+
     override suspend fun save(id: String, item: Thumbnail): SavedItem<Thumbnail> {
         return withContext(NonCancellable + Dispatchers.IO) {
             File(directory, "$id.jpg").let {

@@ -23,15 +23,15 @@
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:src="@{item.image}"
-                android:contentDescription="@{item.text}" />
+                android:src="@{item.thumbnailUri}"
+                android:contentDescription="@{item.annotations}" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:padding="15dp"
                 android:textSize="20sp"
-                android:text="@{item.text}" />
+                android:text="@{item.annotations}" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

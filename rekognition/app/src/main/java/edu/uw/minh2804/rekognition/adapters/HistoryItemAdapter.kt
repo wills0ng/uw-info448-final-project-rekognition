@@ -43,6 +43,6 @@ class DiffCallback : DiffUtil.ItemCallback<HistoryItem>() {
     }
 
     override fun areContentsTheSame(oldItem: HistoryItem, newItem: HistoryItem): Boolean {
-        return oldItem.image == newItem.image
+        return oldItem.photoUri == newItem.photoUri
     }
 }

@@ -7,11 +7,8 @@ import android.util.Log
 import androidx.lifecycle.*
 import edu.uw.minh2804.rekognition.models.HistoryItem
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
-import edu.uw.minh2804.rekognition.stores.SavedItem
-import edu.uw.minh2804.rekognition.stores.Thumbnail
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
+import edu.uw.minh2804.rekognition.stores.PhotoStore
+import edu.uw.minh2804.rekognition.stores.ThumbnailStore
 
 /**
  * A view model for the HistoryFragment. Holds history for images captured using this app
@@ -31,12 +28,21 @@ class HistoryViewModel : ViewModel() {
     /**
      * Populate the history list from the thumbnails directory.
      */
-    suspend fun populateHistoryList(thumbnailUris: List<Uri>, annotationStore: AnnotationStore) {
+    suspend fun populateHistoryList(
+        photoStore: PhotoStore,
+        thumbnailStore: ThumbnailStore,
+        annotationStore: AnnotationStore
+    ) {
         Log.d(TAG, "Initializing the history list")
-        _historyList.value = thumbnailUris.map {
-            val id = File(it.path!!).nameWithoutExtension
+        // Note: treat photo store as source of truth since users can delete photos
+        // Then look up thumbnails and annotations
+        _historyList.value = photoStore.items.map { photo ->
+            val id = photo.value.id
+            val photoUri = Uri.fromFile(photo.value.item.file)
+            val thumbnailUri = thumbnailStore.getUri(id)
             val annotation = annotationStore.findItem(id)
-            HistoryItem(image=it, text=annotation.toString())
+
+            HistoryItem(photoUri, thumbnailUri, annotation.toString())
         }
     }
 

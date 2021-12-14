@@ -64,10 +64,11 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "Getting results from ImageProcessingStore")
 
         // IMPORTANT: Stores can only be initialized after onViewCreated lifecycle
+        val photoStore = PhotoStore(requireActivity())
         val annotationStore = AnnotationStore(requireActivity())
-        val thumbnailUris = ThumbnailStore(requireActivity()).uris
+        val thumbnailStore = ThumbnailStore(requireActivity())
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.populateHistoryList(thumbnailUris, annotationStore)
+            viewModel.populateHistoryList(photoStore, thumbnailStore, annotationStore)
         }
     }
 
