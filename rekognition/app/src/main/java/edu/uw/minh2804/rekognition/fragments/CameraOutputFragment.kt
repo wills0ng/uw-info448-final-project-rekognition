@@ -3,10 +3,13 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -24,11 +27,13 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
     private var currentEndpoint: AnnotationCallback = FirebaseFunctionsService.TextAnnotationCallback
+    private var speechEngine: TextToSpeech? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         requireFirebaseOrShutdown()
+        requireSpeechEngine()
 
         val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
@@ -40,6 +45,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
         model.cameraState.observe(this) {
             if (it == CameraState.CAPTURING) {
+                speechEngine?.speak(getString(R.string.camera_output_on_processing), TextToSpeech.QUEUE_ADD, null, hashCode().toString())
                 outputView.text = getString(R.string.camera_output_on_processing)
                 outputView.visibility = View.VISIBLE
             }
@@ -55,17 +61,21 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                         val resultToDisplay = currentEndpoint.onResultReceived(result)
                         if (resultToDisplay != null) {
                             displayViewInFixedDuration(outputView, resultToDisplay)
+                            speechEngine?.speak(resultToDisplay, TextToSpeech.QUEUE_ADD, null, id)
                             annotationStore.save(id, Annotation(result))
                             model.onImageAnnotated()
                         } else {
                             val errorToDisplay = currentEndpoint.onResultNotFound(requireContext())
+                            speechEngine?.speak(errorToDisplay, TextToSpeech.QUEUE_ADD, null, id)
                             displayViewInFixedDuration(outputView, errorToDisplay)
                             model.onImageAnnotateFailed()
                         }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, e.toString())
-                    displayViewInFixedDuration(outputView, getString(R.string.camera_output_internal_error))
+                    val errorToDisplay = getString(R.string.camera_output_internal_error)
+                    speechEngine?.speak(errorToDisplay, TextToSpeech.QUEUE_ADD, null, id)
+                    displayViewInFixedDuration(outputView, errorToDisplay)
                     model.onImageAnnotateFailed()
                 }
             }
@@ -95,6 +105,21 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
             if (!FirebaseAuthService.isSignedIn()) {
                 FirebaseAuthService.signIn()
             }
+        }
+    }
+
+    // https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html
+    private fun requireSpeechEngine() {
+        lifecycleScope.launch {
+            val checkIntent = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                    speechEngine = TextToSpeech(requireContext()) {}
+                } else {
+                    val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+                    startActivity(installIntent)
+                }
+            } .run { launch(checkIntent) }
         }
     }
 
