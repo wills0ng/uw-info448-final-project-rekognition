@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.launch
 
-data class CameraOutput(val id: String, val image: File, val requestAnnotator: Annotator)
+data class CameraOutput(val id: String, val image: File, val requestAnnotator: Annotator, var isProcessed: Boolean = false)
 
 // CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
@@ -36,10 +36,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private val model: CameraViewModel by activityViewModels()
     private var imageCapture: ImageCapture? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireCameraOrShutdown()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireCameraOrShutdown()
 
         val tabs = view.findViewById<TabLayout>(R.id.tab_layout_camera_navigation)
 

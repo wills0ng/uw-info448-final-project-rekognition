@@ -1,5 +1,6 @@
 package edu.uw.minh2804.rekognition.viewmodels
 
+import android.speech.tts.TextToSpeech
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,8 @@ enum class CameraState {
 }
 
 class CameraViewModel : ViewModel() {
+    var speechEngine: TextToSpeech? = null
+
     private val _tabPosition = MutableLiveData<Int>()
     val tabPosition: LiveData<Int>
         get() = _tabPosition
@@ -21,6 +24,10 @@ class CameraViewModel : ViewModel() {
     private val _capturedPhoto = MutableLiveData<CameraOutput>()
     val capturedPhoto: LiveData<CameraOutput>
         get() = _capturedPhoto
+
+    private val _displayMessage = MutableLiveData<String>()
+    val displayMessage: LiveData<String>
+        get() = _displayMessage
 
     fun onTabPositionChanged(index: Int) {
         _tabPosition.value = index
@@ -39,11 +46,18 @@ class CameraViewModel : ViewModel() {
         _cameraState.value = CameraState.IDLE
     }
 
-    fun onImageAnnotated() {
+    fun onImageAnnotated(displayMessage: String) {
         _cameraState.value = CameraState.IDLE
+        _displayMessage.value = displayMessage
     }
 
-    fun onImageAnnotateFailed() {
+    fun onImageAnnotateFailed(displayMessage: String) {
         _cameraState.value = CameraState.IDLE
+        _displayMessage.value = displayMessage
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        speechEngine?.shutdown()
     }
 }

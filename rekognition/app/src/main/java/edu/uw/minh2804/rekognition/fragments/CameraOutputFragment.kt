@@ -27,67 +27,73 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private lateinit var thumbnailStore: ThumbnailStore
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
-    private var speechEngine: TextToSpeech? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireFirebaseOrShutdown()
+        requireSpeechEngine()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireFirebaseOrShutdown()
-        requireSpeechEngine()
 
         thumbnailStore = ThumbnailStore(requireActivity())
         val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
 
-        model.cameraState.observe(this) {
-            if (it == CameraState.CAPTURING) {
-                speechEngine?.speak(getString(R.string.camera_output_on_processing), TextToSpeech.QUEUE_ADD, null, hashCode().toString())
-                outputView.text = getString(R.string.camera_output_on_processing)
-                outputView.visibility = View.VISIBLE
-            }
+        model.displayMessage.observe(this) {
+            displayMessageInFixedDuration(outputView, it)
         }
 
-        model.capturedPhoto.observe(this) {
-            lifecycleScope.launch {
-                val id = it.id
-                val thumbnail = Thumbnail(it.image)
-                launch { thumbnailStore.save(it.id, thumbnail) }
-                try {
-                    // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
-                    withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
-                        val result = it.requestAnnotator.annotate(thumbnail.bitmap)
-                        val formattedResult = it.requestAnnotator.formatResult(result)
-                        formattedResult?.let { resultToDisplay ->
-                            displayViewInFixedDuration(outputView, resultToDisplay)
-                            speechEngine?.speak(resultToDisplay, TextToSpeech.QUEUE_ADD, null, id)
-                            annotationStore.save(id, Annotation(result))
-                            model.onImageAnnotated()
-                        } ?: run {
-                            val errorToDisplay = getString(
-                                R.string.camera_output_result_not_found,
-                                it.requestAnnotator.getResultType(requireContext())
-                            )
-                            displayViewInFixedDuration(outputView, errorToDisplay)
-                            speechEngine?.speak(errorToDisplay, TextToSpeech.QUEUE_ADD, null, id)
-                            model.onImageAnnotateFailed()
+        model.capturedPhoto.observe(this) { cameraOutput ->
+            if (!cameraOutput.isProcessed) {
+                lifecycleScope.launch {
+                    val id = cameraOutput.id
+                    val processing = getString(R.string.camera_output_on_processing)
+                    speak(id, processing)
+                    displayMessageInFixedDuration(outputView, processing)
+                    val thumbnail = Thumbnail(cameraOutput.image)
+                    launch { thumbnailStore.save(cameraOutput.id, thumbnail) }
+                    try {
+                        // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
+                        withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
+                            val result = cameraOutput.requestAnnotator.annotate(thumbnail.bitmap)
+                            val formattedResult = cameraOutput.requestAnnotator.formatResult(result)
+                            if (formattedResult != null) {
+                                speak(id, formattedResult)
+                                model.onImageAnnotated(formattedResult)
+                                annotationStore.save(cameraOutput.id, Annotation(result))
+                            } else {
+                                val errorToDisplay = getString(
+                                    R.string.camera_output_result_not_found,
+                                    cameraOutput.requestAnnotator.getResultType(requireContext())
+                                )
+                                speak(id, errorToDisplay)
+                                model.onImageAnnotated(errorToDisplay)
+                            }
                         }
+                    } catch (e: Exception) {
+                        Log.e(TAG, e.toString())
+                        val errorToDisplay = getString(R.string.camera_output_internal_error)
+                        speak(id, errorToDisplay)
+                        displayMessageInFixedDuration(outputView, errorToDisplay)
+                        model.onImageAnnotateFailed(errorToDisplay)
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, e.toString())
-                    val errorToDisplay = getString(R.string.camera_output_internal_error)
-                    speechEngine?.speak(errorToDisplay, TextToSpeech.QUEUE_ADD, null, id)
-                    displayViewInFixedDuration(outputView, errorToDisplay)
-                    model.onImageAnnotateFailed()
+                    cameraOutput.isProcessed = true
                 }
             }
         }
     }
 
-    private fun displayViewInFixedDuration(view: TextView, output: String) {
+    private fun speak(id: String, message: String) {
+        model.speechEngine?.speak(message, TextToSpeech.QUEUE_ADD, null, id)
+    }
+
+    private fun displayMessageInFixedDuration(view: TextView, message: String) {
         // displayViewInFixedDuration could be previously called and the delay haven't elapsed yet,
         // so cancelling the previous call is needed to reset the clock.
         viewVisibilityScope.coroutineContext.cancelChildren()
-        view.text = output
+        view.text = message
         view.visibility = View.VISIBLE
         viewVisibilityScope.launch {
             delay(1000 * TEXT_DISPLAY_DURATION_IN_SECONDS)
@@ -114,7 +120,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         val checkIntent = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                speechEngine = TextToSpeech(requireContext()) {}
+                model.speechEngine = TextToSpeech(requireContext()) {}
             } else {
                 val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
                 startActivity(installIntent)
@@ -124,7 +130,6 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        speechEngine?.shutdown()
         viewVisibilityScope.cancel()
     }
 
