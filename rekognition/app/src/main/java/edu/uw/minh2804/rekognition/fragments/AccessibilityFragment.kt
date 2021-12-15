@@ -1,4 +1,4 @@
-/** Tom Nguyen: I wrote this class and it's corresponding xml files. **/
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
 
 package edu.uw.minh2804.rekognition.fragments
 
@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 
 data class CameraOutput(val id: String, val image: File, val requestAnnotator: Annotator, var isProcessed: Boolean = false)
 
-// This class handles the user request of capturing photo.
+// This fragment is responsible for handling user inputs and updating it to the view model.
+// User input includes selecting one of the detection options and taking picture.
 class AccessibilityFragment : Fragment(R.layout.fragment_accessibility) {
     private lateinit var photoStore: PhotoStore
     private val model: CameraViewModel by activityViewModels()

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
+// This is a builder class to build the http request body for the text recognition Firebase's function.
 object TextRecognitionRequest {
     private val feature = JsonObject().also { it.add("type", JsonPrimitive("TEXT_DETECTION")) }
     private val features = JsonArray().also { it.add(feature) }

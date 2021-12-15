@@ -6,7 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 
-// Base class for all other activities within this app.
+// Base activity that enables the action bar by default.
 // This allow for consistency across the app.
 open class ActionBarActivity(contentLayoutId: Int, private val hideIcon: Boolean = false) : AppCompatActivity(contentLayoutId) {
     override fun onCreate(savedInstanceState: Bundle?) {

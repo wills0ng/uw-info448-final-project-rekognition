@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
@@ -23,11 +25,11 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.launch
 
-// This class is used to throw when the user didn't grant permission to camera.
+// This exception is used to throw when the user failed to grant camera permission.
 class CameraNotDetectedException : Exception("Camera not detected")
 
-// This class handles the core camera functionality.
-// It will display the back camera output onto a view and provides a method to capture photos.
+// This fragment is responsible for handling the core camera functionality.
+// It will display the back camera output onto a view and exposed a method to directly capture photos.
 // See more: https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
     private lateinit var cameraExecutor: ExecutorService

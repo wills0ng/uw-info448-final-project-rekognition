@@ -1,4 +1,4 @@
-/** Tom Nguyen: I wrote this class and it's corresponding xml files. **/
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
 
 package edu.uw.minh2804.rekognition.fragments
 
@@ -21,10 +21,10 @@ import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
-// This class is used to throw when there is no internet.
+// This exception is used to throw when there is no internet connection.
 class InternetNotFoundException : Exception("Internet not detected")
 
-// This class handles the annotation of each captured photo and display it's output.
+// This fragment is responsible for handling image processing and annotation of the captured photo.
 class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
     private lateinit var annotationStore: AnnotationStore
     private lateinit var thumbnailStore: ThumbnailStore
@@ -56,14 +56,14 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
                 // If it takes more than CONNECTION_TIMEOUT_IN_SECONDS to retrieve the result, then a TimeoutCancellationException will be thrown.
                 withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
                     val result = output.requestAnnotator.annotate(thumbnail.bitmap)
-                    val formattedResult = output.requestAnnotator.formatResult(result)
+                    val formattedResult = output.requestAnnotator.onAnnotated(result)
                     if (formattedResult != null) {
                         model.onImageAnnotated(formattedResult)
                         annotationStore.save(id, Annotation(result))
                     } else {
                         val errorToDisplay = getString(
                             R.string.camera_output_result_not_found,
-                            output.requestAnnotator.getResultType(requireContext())
+                            output.requestAnnotator.getType(requireContext())
                         )
                         model.onImageAnnotated(errorToDisplay)
                     }
@@ -82,7 +82,7 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
             if (!requireActivity().isPermissionGranted(requiredPermission)) {
                 requireActivity().requestPermission(requiredPermission)
             }
-            if (isInternetEnable() && !FirebaseAuthService.isSignedIn()) {
+            if (isInternetEnable() && !FirebaseAuthService.isAuthenticated()) {
                 FirebaseAuthService.signIn()
             }
         }

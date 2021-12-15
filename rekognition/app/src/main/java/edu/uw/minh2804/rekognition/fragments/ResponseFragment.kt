@@ -1,10 +1,11 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.fragments
 
 import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,12 +15,13 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
-// This class handles displaying message to user.
-// The message will come in a text and voice forms.
+// This fragment is responsible for outputting messages to the user.
+// The message will always be outputted by text,
+// In addition, if text to speech is supported by the android device,
+// then voice will also be outputted.
 class ResponseFragment : Fragment(R.layout.fragment_response) {
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
-    private var id: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +46,7 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
     }
 
     private fun outputMessageInFixedDuration(message: String) {
-        // displayViewInFixedDuration could be called previously and the duration to toggle text off might haven't elapsed yet,
+        // This function could be called previously and the duration to toggle text off might haven't elapsed yet,
         // so cancelling the previous call is needed to reset the clock.
         viewVisibilityScope.coroutineContext.cancelChildren()
         val textView = requireView() as TextView
@@ -58,12 +60,12 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
     }
 
     private fun speak(message: String) {
-        model.speechEngine?.speak(message, TextToSpeech.QUEUE_FLUSH, null, (++id).toString())
+        model.speechEngine?.speak(message, TextToSpeech.QUEUE_FLUSH, null, hashCode().toString())
     }
 
     // See more: https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html
     private fun requireSpeechEngineOrIgnore() {
-        val checkForTts = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
+        val checkForTtsData = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 model.speechEngine = TextToSpeech(requireContext()) {}
@@ -71,7 +73,7 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
                 val redirectToInstall = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
                 startActivity(redirectToInstall)
             }
-        } .run { launch(checkForTts) }
+        } .run { launch(checkForTtsData) }
     }
 
     companion object {

@@ -6,6 +6,7 @@
  * - Save EXIF data in the save() method
  * - getUri()
  */
+
 package edu.uw.minh2804.rekognition.stores
 
 import android.graphics.Bitmap
@@ -21,11 +22,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
-class Thumbnail(file: File) {
-    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scaleDown(ThumbnailSetting.MAX_DIMENSION).copy(Bitmap.Config.RGB_565, false)
-    val orientation: String? = ExifInterface(file.absolutePath).getAttribute(ExifInterface.TAG_ORIENTATION)
+// This class is responsible for storing and building a thumbnail from a given image file.
+class Thumbnail(image: File) {
+    val bitmap: Bitmap = BitmapFactory.decodeFile(image.toURI().path).scaleDown(MAX_DIMENSION).copy(Bitmap.Config.RGB_565, false)
+    val orientation: String? = ExifInterface(image.absolutePath).getAttribute(ExifInterface.TAG_ORIENTATION)
+
+    companion object Setting {
+        const val MAX_DIMENSION = 640
+    }
 }
 
+// This store is responsible for reading and writing thumbnail data to the device's internal storage.
 class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnail> {
     private val directory: File by lazy {
         context.filesDir.let { appDirectory ->
@@ -70,8 +77,4 @@ class ThumbnailStore(private val context: FragmentActivity) : ItemStore<Thumbnai
             SavedItem(id, item)
         }
     }
-}
-
-object ThumbnailSetting {
-    const val MAX_DIMENSION = 640
 }

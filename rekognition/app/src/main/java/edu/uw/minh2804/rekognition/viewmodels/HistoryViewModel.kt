@@ -83,7 +83,7 @@ class HistoryViewModel : ViewModel() {
                 this.fullTextAnnotation?.let { textAnnotation ->
                     AnnotationPair("Text", textAnnotation.text)
                 } ?:
-                    AnnotationPair("Objects", Object.formatResult(this))
+                    AnnotationPair("Objects", Object.onAnnotated(this))
             }
         } ?: AnnotationPair("No Result", null)
     }

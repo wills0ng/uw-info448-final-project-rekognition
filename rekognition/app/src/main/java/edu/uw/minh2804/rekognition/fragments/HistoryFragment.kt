@@ -1,7 +1,6 @@
 /**
  * Will Song: I wrote this file.
  */
-
 package edu.uw.minh2804.rekognition.fragments
 
 import android.content.Intent

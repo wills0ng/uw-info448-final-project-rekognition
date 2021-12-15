@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.stores
 
 import androidx.fragment.app.FragmentActivity
@@ -9,8 +11,11 @@ import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+// This class is used to provide semantic to a file object.
+// In other word, the file that it is holding is a photo.
 data class Photo(val file: File)
 
+// This store is responsible for reading and writing photo data to the device's internal storage.
 class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
     private val directory: File by lazy {
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let { appDirectory ->
