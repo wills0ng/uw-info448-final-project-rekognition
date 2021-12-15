@@ -14,14 +14,17 @@
         >
         <action
             android:id="@+id/action_seeHistoryDetails"
-            app:destination="@id/historyDetailsFragment" />
+            app:destination="@id/HistoryDetailsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/historyDetailsFragment"
+        android:id="@+id/HistoryDetailsFragment"
         android:name="edu.uw.minh2804.rekognition.fragments.HistoryDetailsFragment"
         tools:layout="@layout/fragment_history_details">
         <argument
             android:name="item"
             app:argType="edu.uw.minh2804.rekognition.models.HistoryItem" />
+        <action
+            android:id="@+id/action_backToHistory"
+            app:destination="@id/HistoryFragment" />
     </fragment>
 </navigation>
