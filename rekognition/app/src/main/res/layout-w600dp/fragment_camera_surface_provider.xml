@@ -55,6 +55,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="@string/take_picture"
+        android:contentDescription="@string/camera_take_photo"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

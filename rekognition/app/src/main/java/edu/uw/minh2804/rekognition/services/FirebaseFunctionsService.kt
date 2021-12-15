@@ -16,12 +16,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-interface Annotator {
-    fun getResultType(context: Context): String
-    fun formatResult(result: AnnotateImageResponse): String?
-    suspend fun annotate(image: Bitmap): AnnotateImageResponse
-}
-
 data class Property(
     val name: String,
     val value: String
@@ -45,12 +39,25 @@ data class AnnotateImageResponse(
     val labelAnnotations: List<EntityAnnotation>
 ) : Parcelable
 
+interface Annotator {
+    // Gets a unique identifier of the type of annotation this Annotator provides
+    fun getResultType(context: Context): String
+    // Formats the annotation response into a string, if the response is valid
+    fun formatResult(result: AnnotateImageResponse): String?
+    // Annotates an image with a description
+    suspend fun annotate(image: Bitmap): AnnotateImageResponse
+}
+
 object FirebaseFunctionsService {
     private const val TAG = "FirebaseFunctionsService"
     private val functions = Firebase.functions
 
+    // This enum class encapsulates the differences between the text and object recognition
+    // endpoints, allowing for code referencing these endpoints to be agnostic of these differences
     enum class Endpoint : Annotator {
         TEXT {
+            // The string resource labelling each tab in the camera activity is a unique identifier
+            // of the endpoint, and is widely accessible across the code base.
             override fun getResultType(context: Context): String {
                 return context.getString(R.string.camera_text_recognition)
             }
