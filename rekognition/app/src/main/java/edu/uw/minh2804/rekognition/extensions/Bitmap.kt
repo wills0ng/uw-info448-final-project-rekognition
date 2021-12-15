@@ -28,6 +28,7 @@ fun Bitmap.scaleDown(maxDimension: Int): Bitmap {
     return Bitmap.createScaledBitmap(this, resizedWidth, resizedHeight, false)
 }
 
+// Compress and convert a bitmap into a string that can be sent over https
 fun Bitmap.toString64(): String {
     val stream = ByteArrayOutputStream().also {
         this.compress(Bitmap.CompressFormat.JPEG, 100, it)

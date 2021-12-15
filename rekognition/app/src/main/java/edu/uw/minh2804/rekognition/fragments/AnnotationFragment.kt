@@ -39,7 +39,7 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
         annotationStore = AnnotationStore(requireActivity())
         thumbnailStore = ThumbnailStore(requireActivity())
 
-        // Observe newly captured photos
+        // Annotate newly captured photos
         model.capturedPhoto.observe(this) {  if (!it.isProcessed) annotate(it) }
     }
 
@@ -78,6 +78,7 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
         }
     }
 
+    // Get internet permission, and if internet is available, authenticate with firebase
     private fun requireFirebaseOrIgnore() {
         lifecycleScope.launch {
             val requiredPermission = Manifest.permission.INTERNET
