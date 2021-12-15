@@ -25,6 +25,7 @@ import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
+// This class handles the annotation of each captured photo and display it's output.
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private lateinit var thumbnailStore: ThumbnailStore
     private val model: CameraViewModel by activityViewModels()
@@ -49,12 +50,12 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
             if (!cameraOutput.isProcessed) {
                 lifecycleScope.launch {
                     val id = cameraOutput.id
+                    val thumbnail = Thumbnail(cameraOutput.image)
+                    launch { thumbnailStore.save(cameraOutput.id, thumbnail) }
                     if (isInternetEnable()) {
                         val processing = getString(R.string.camera_output_on_processing)
                         speak(id, processing)
                         displayMessageInFixedDuration(outputView, processing)
-                        val thumbnail = Thumbnail(cameraOutput.image)
-                        launch { thumbnailStore.save(cameraOutput.id, thumbnail) }
                         try {
                             // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
                             withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
