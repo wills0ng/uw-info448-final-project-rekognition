@@ -39,6 +39,8 @@ class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotat
         }
     }
 
+    // Save the item into internal storage, with the id as file name.
+    // Returns a SavedItem wrapper as indicator of success, else throw exceptions.
     override suspend fun save(id: String, item: Annotation): SavedItem<Annotation> {
         return withContext(NonCancellable + Dispatchers.IO) {
             File(directory, "$id.json").also {

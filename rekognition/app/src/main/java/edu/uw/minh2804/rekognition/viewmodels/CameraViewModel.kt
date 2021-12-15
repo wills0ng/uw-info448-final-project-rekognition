@@ -25,38 +25,49 @@ class CameraViewModel : ViewModel() {
     val messageToUser: LiveData<String>
         get() = _messageToUser
 
+    // This function is called when the user select a different option in the tab bar.
     fun onTabPositionChanged(index: Int) {
         _tabPosition.value = index
     }
 
+    // This function is called when the camera finish capturing the photo.
     fun onCameraCaptured(photo: CameraOutput) {
         _capturedPhoto.value = photo
     }
 
-    fun onCameraCaptureFailed(displayMessage: String) {
-        _messageToUser.value = displayMessage
-    }
-
+    // This function is called when the camera predictively failed to capture the photo.
     fun onCameraCaptureFailed(e: Exception) {
         onCameraCaptureFailed(e.message!!)
     }
 
+    // This function is called when the camera unexpectedly failed to capture the photo.
+    // Hence the need to display a different generic message for the user, rather than an exception.
+    fun onCameraCaptureFailed(displayMessage: String) {
+        _messageToUser.value = displayMessage
+    }
+
+    // This function is called when the captured photo is about to be process for annotation.
     fun onImageAnnotating(displayMessage: String) {
         _messageToUser.value = displayMessage
     }
 
+    // This function is called when the captured photo is processed and annotated.
     fun onImageAnnotated(displayMessage: String) {
         _messageToUser.value = displayMessage
     }
 
-    fun onImageAnnotateFailed(displayMessage: String) {
-        _messageToUser.value = displayMessage
-    }
-
+    // This function is called when annotation failed predictively.
     fun onImageAnnotateFailed(e: Exception) {
         onImageAnnotateFailed(e.message!!)
     }
 
+    // This function is called when the annotation failed unexpectedly.
+    // Hence the need to display a different generic message for the user, rather than an exception.
+    fun onImageAnnotateFailed(displayMessage: String) {
+        _messageToUser.value = displayMessage
+    }
+
+    // Needed to release the speechEngine resource.
     override fun onCleared() {
         super.onCleared()
         speechEngine?.shutdown()

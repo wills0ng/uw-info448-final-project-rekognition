@@ -74,7 +74,7 @@ class HistoryViewModel : ViewModel() {
         return itemExists
     }
 
-    // Parse SavedAnnotation objects into AnnotationPair objects.
+    // Parse saved annotation objects into AnnotationPair objects.
     // Specifically, determines wither the annotation had no results, had text detection results,
     // or had object label results, and returns the annotation type and simplified text string.
     private fun parseAnnotation(savedAnnotation: SavedItem<Annotation>?): AnnotationPair {
