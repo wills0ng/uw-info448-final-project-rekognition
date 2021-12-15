@@ -45,13 +45,36 @@
                             android:src="@{item.photoUri}"
                             android:contentDescription="@{item.annotation.text}"/>
 
-                        <TextView
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@{item.annotation.text}"
-                            android:padding="15dp"
-                            android:textSize="20sp"
-                            />
+                            android:layout_height="match_parent"
+                            android:padding="15dp">
+                            <TextView
+                                android:id="@+id/text_historyItem_annotationType"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@{item.annotation.type}"
+                                android:textSize="16sp"
+                                android:textColor="@color/black_65"
+                                android:textStyle="bold"
+                                android:textAllCaps="true" />
+                            <TextView
+                                android:id="@+id/text_historyItem_date"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_toEndOf="@id/text_historyItem_annotationType"
+                                relativeDateTime="@{item.date}"
+                                android:textSize="16sp"
+                                android:gravity="end"/>
+                            <TextView
+                                android:id="@+id/text_historyItem_annotationText"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_below="@id/text_historyItem_annotationType"
+                                android:gravity="center_vertical"
+                                android:text="@{item.annotation.text}"
+                                android:textSize="20sp" />
+                        </RelativeLayout>
 
                     </LinearLayout>
 

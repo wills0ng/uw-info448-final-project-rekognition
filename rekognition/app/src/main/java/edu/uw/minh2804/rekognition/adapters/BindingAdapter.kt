@@ -2,9 +2,7 @@
 
 package edu.uw.minh2804.rekognition.adapters
 
-import android.graphics.Bitmap
 import android.text.format.DateUtils
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,16 +18,20 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: List<HistoryItem>?) {
     }
 }
 
-@BindingAdapter("imageThumbnail")
-fun loadImageBitmap(imageView: ImageView, thumbnail: Bitmap) {
-    imageView.setImageBitmap(thumbnail)
+// BindingAdapter for displaying relative time spans (e.g. 3 hours ago)
+@BindingAdapter("relativeTimeSpan")
+fun displayRelativeTimeSpan(textView: TextView, date: Date) {
+    textView.text = DateUtils.getRelativeTimeSpanString(date.time)
 }
 
-@BindingAdapter("relativeTime")
-fun displayRelativeTime(textView: TextView, date: Date) {
-    textView.text = DateUtils.getRelativeTimeSpanString(
-        date.getTime(),
-        Calendar.getInstance().getTimeInMillis(),
-        DateUtils.MINUTE_IN_MILLIS
+//BindingAdapter for displaying relative date time
+@BindingAdapter("relativeDateTime")
+fun displayRelativeDateTime(textView: TextView, date: Date) {
+    textView.text = DateUtils.getRelativeDateTimeString(
+        textView.context,
+        date.time,
+        DateUtils.MINUTE_IN_MILLIS,
+        DateUtils.DAY_IN_MILLIS,
+        DateUtils.FORMAT_SHOW_TIME
     )
 }
