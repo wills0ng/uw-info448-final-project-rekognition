@@ -33,9 +33,7 @@ class HistoryViewModel : ViewModel() {
         Log.d(TAG, "HistoryViewModel initialized")
     }
 
-    /**
-     * Set the data stores used by the ViewModel.
-     */
+    // Set the data stores used by this ViewModel
     fun setDataStores(
         photoStore: PhotoStore,
         thumbnailStore: ThumbnailStore,
@@ -46,9 +44,7 @@ class HistoryViewModel : ViewModel() {
        _annotationStore = annotationStore
     }
 
-    /**
-     * Populate the history list from stored data.
-     */
+    // Populate the ViewModel internal history list from the data stores
     suspend fun updateHistoryList() {
         Log.d(TAG, "Updating the history list")
         // Note: treat photo store as source of truth since users can delete photos
@@ -65,6 +61,7 @@ class HistoryViewModel : ViewModel() {
         Log.d(TAG, "Finished updating history list")
     }
 
+    // Given an id, checks if that item exists in the internal _historyList
     fun doesItemExist(id: String): Boolean {
         var itemExists = false
         _historyList.value?.let {
@@ -77,6 +74,9 @@ class HistoryViewModel : ViewModel() {
         return itemExists
     }
 
+    // Parse SavedAnnotation objects into AnnotationPair objects.
+    // Specifically, determines wither the annotation had no results, had text detection results,
+    // or had object label results, and returns the annotation type and simplified text string.
     private fun parseAnnotation(savedAnnotation: SavedItem<Annotation>?): AnnotationPair {
         return savedAnnotation?.let {
             with(it.item.result) {

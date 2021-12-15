@@ -2,4 +2,17 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="main_button_margin">20dp</dimen>
     <dimen name="history_fab_margin">16dp</dimen>
+    <dimen name="history_noHistoryMessage_textSize">30sp</dimen>
+    <dimen name="historyDetails_cardMargin">15dp</dimen>
+    <dimen name="historyDetails_cardCornerRadius">8dp</dimen>
+    <dimen name="historyDetails_cardElevation">5dp</dimen>
+    <dimen name="historyDetails_textSection_padding">15dp</dimen>
+    <dimen name="historyDetails_secondaryTextSize">16sp</dimen>
+    <dimen name="historyDetails_primaryTextSize">20sp</dimen>
+    <dimen name="historyItem_cardCornerRadius">4dp</dimen>
+    <dimen name="historyItem_cardLayoutMargin">5dp</dimen>
+    <dimen name="historyItem_cardElevation">5dp</dimen>
+    <dimen name="historyItem_textSectionPadding">15dp</dimen>
+    <dimen name="historyItem_secondaryTextSize">16sp</dimen>
+    <dimen name="historyItem_primaryTextSize">20sp</dimen>
 </resources>
