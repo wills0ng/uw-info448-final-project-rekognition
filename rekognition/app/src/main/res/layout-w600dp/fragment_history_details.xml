@@ -43,12 +43,12 @@
                             android:scaleType="fitXY"
                             android:adjustViewBounds="true"
                             android:src="@{item.photoUri}"
-                            android:contentDescription="@{item.annotations}"/>
+                            android:contentDescription="@{item.annotation}"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@{item.annotations}"
+                            android:text="@{item.annotation}"
                             android:padding="15dp"
                             android:textSize="20sp"
                             />
