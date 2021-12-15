@@ -7,10 +7,30 @@
     android:layout_width="match_parent"
     tools:context=".fragments.CameraFragment"
     >
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout_camera_navigation"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        >
+        <com.google.android.material.tabs.TabItem
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/camera_text_recognition"
+            />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/camera_image_labeling"
+            />
+    </com.google.android.material.tabs.TabLayout>
     <androidx.camera.view.PreviewView
         android:id="@+id/preview_camera_finder"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout_camera_navigation"
         />
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_output"

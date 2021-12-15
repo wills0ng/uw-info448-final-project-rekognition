@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.tabs.TabLayout
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
@@ -42,7 +43,31 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         super.onViewCreated(view, savedInstanceState)
 
         requireCameraOrShutdown()
+
         view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
+
+        view.findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    Log.v(TAG, "${tab!!.text.toString()} tab selected")
+                    model.onSetCameraTab(
+                        when (tab!!.text) {
+                            getString(R.string.camera_text_recognition) -> FirebaseFunctionsService.Endpoint.TEXT
+                            getString(R.string.camera_image_labeling) -> FirebaseFunctionsService.Endpoint.OBJECT
+                            else -> {
+                                Log.e(TAG, "Tab label ${tab.text} inconsistent with resources")
+                                Log.v(TAG, "Setting firebase endpoint to default: TEXT")
+                                FirebaseFunctionsService.Endpoint.TEXT
+                            }
+                        }
+                    )
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            }
+        )
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         photoStore = PhotoStore(requireActivity())
