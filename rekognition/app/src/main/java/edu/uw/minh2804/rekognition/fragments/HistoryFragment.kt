@@ -1,7 +1,6 @@
 /**
- * Will Song: Wrote most of this file.
- * Tom Nguyen: Wrote code for the onViewCreated() method and the `histories` attribute.
- * */
+ * Will Song: I wrote this file.
+ */
 
 package edu.uw.minh2804.rekognition.fragments
 
@@ -22,6 +21,9 @@ import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Code for the History Fragment
+ */
 class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
     private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
@@ -54,6 +56,7 @@ class HistoryFragment : Fragment() {
         return binding.root
     }
 
+    // When the view is created, provide the data stores to the ViewModel and refresh the data
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "Getting results from ImageProcessingStore")
@@ -69,6 +72,7 @@ class HistoryFragment : Fragment() {
         }
     }
 
+    // When resuming the Fragment, refresh the history data to check for added/deleted files
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "Fragment resumed")
@@ -77,6 +81,9 @@ class HistoryFragment : Fragment() {
         }
     }
 
+    // Function to refresh the history data in the ViewModel and update the Views
+    // Specifically, if the list switches from empty to not empty or vice versa, display a
+    // placeholder message to indicate no history items
     private suspend fun refreshHistory() {
         viewModel.updateHistoryList()
         viewModel.historyList.value?.let {

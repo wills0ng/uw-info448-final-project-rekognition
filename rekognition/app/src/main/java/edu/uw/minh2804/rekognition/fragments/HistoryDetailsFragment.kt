@@ -19,6 +19,9 @@ import edu.uw.minh2804.rekognition.models.HistoryItem
 import edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Code for the HistoryDetails Fragment
+ */
 class HistoryDetailsFragment : Fragment() {
     // Get reference to shared nav graph scoped ViewModel
     private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
@@ -51,6 +54,8 @@ class HistoryDetailsFragment : Fragment() {
         return binding.root
     }
 
+    // When the fragment resumes, refresh the ViewModel data to see if the item still exists
+    // Redirect users to the HistoryFragment if the item has been deleted
     override fun onResume() {
         Log.d(TAG, "Fragment resuming")
         super.onResume()
