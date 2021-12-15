@@ -1,5 +1,6 @@
 /**
  * Tom Nguyen: Wrote vast majority of this file.
+ *
  * Will Song: Contributed code for
  * - Thumbnail.orientation
  * - Save EXIF data in the save() method

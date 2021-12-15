@@ -21,9 +21,9 @@
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            card_view:cardCornerRadius="8dp"
-            android:layout_margin="15dp"
-            card_view:cardElevation="5dp">
+            card_view:cardCornerRadius="@dimen/historyDetails_cardCornerRadius"
+            android:layout_margin="@dimen/historyDetails_cardMargin"
+            card_view:cardElevation="@dimen/historyDetails_cardElevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,13 +45,13 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="15dp">
+                        android:padding="@dimen/historyDetails_textSection_padding">
                         <TextView
                             android:id="@+id/text_historyItem_annotationType"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@{item.annotation.type}"
-                            android:textSize="24sp"
+                            android:textSize="@dimen/historyDetails_secondaryTextSize"
                             android:textColor="@color/black_65"
                             android:textStyle="bold"
                             android:textAllCaps="true" />
@@ -61,7 +61,7 @@
                             android:layout_height="wrap_content"
                             android:layout_toEndOf="@id/text_historyItem_annotationType"
                             relativeDateTime="@{item.date}"
-                            android:textSize="24sp"
+                            android:textSize="@dimen/historyDetails_secondaryTextSize"
                             android:gravity="end"/>
                         <TextView
                             android:id="@+id/text_historyItem_annotationText"
@@ -70,7 +70,7 @@
                             android:layout_below="@id/text_historyItem_annotationType"
                             android:gravity="center_vertical"
                             android:text="@{item.annotation.text}"
-                            android:textSize="30sp" />
+                            android:textSize="@dimen/historyDetails_primaryTextSize" />
                     </RelativeLayout>
 
                 </androidx.core.widget.NestedScrollView>

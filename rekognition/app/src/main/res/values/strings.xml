@@ -23,4 +23,5 @@
     <string name="camera_output_internal_error">Something went wrong, please try again later.</string>
     <string name="take_picture">Take Picture</string>
     <string name="require_internet">No internet detected</string>
+    <string name="history_noHistoryMessage">No History</string>
 </resources>
