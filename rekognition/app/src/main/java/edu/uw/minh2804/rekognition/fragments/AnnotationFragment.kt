@@ -44,7 +44,6 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
     }
 
     private fun annotate(output: CameraOutput) {
-        context ?: return
         lifecycleScope.launch {
             val id = output.id
             val thumbnail = Thumbnail(output.image)
@@ -57,6 +56,7 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
             try {
                 // If it takes more than CONNECTION_TIMEOUT_IN_SECONDS to retrieve the result, then a TimeoutCancellationException will be thrown.
                 withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
+                    context ?: return@withTimeout
                     val result = output.requestAnnotator.annotate(thumbnail.bitmap)
                     val formattedResult = output.requestAnnotator.onAnnotated(result)
                     if (formattedResult != null) {

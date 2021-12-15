@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
@@ -45,10 +46,13 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
         viewVisibilityScope.cancel()
     }
 
-    private fun outputMessageInFixedDuration(message: String) {
+    private fun outputMessageInFixedDuration(message: String?) {
+        message ?: return
+
         // This function could be called previously and the duration to toggle text off might haven't elapsed yet,
         // so cancelling the previous call is needed to reset the clock.
         viewVisibilityScope.coroutineContext.cancelChildren()
+
         val textView = requireView() as TextView
         speak(message)
         textView.text = message

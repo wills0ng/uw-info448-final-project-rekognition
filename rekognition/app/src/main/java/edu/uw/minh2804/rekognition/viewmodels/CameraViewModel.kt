@@ -21,8 +21,8 @@ class CameraViewModel : ViewModel() {
     val capturedPhoto: LiveData<CameraOutput>
         get() = _capturedPhoto
 
-    private val _messageToUser = MutableLiveData<String>()
-    val messageToUser: LiveData<String>
+    private val _messageToUser = MutableLiveData<String?>()
+    val messageToUser: LiveData<String?>
         get() = _messageToUser
 
     // This function is called when the user select a different option in the tab bar.
