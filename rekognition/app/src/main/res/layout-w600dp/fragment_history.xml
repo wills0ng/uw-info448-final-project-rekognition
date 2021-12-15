@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Will Song: I wrote this file. -->
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.HistoryFragment"
+    >
+    <data>
+        <variable
+            name="viewModel"
+            type="edu.uw.minh2804.rekognition.viewmodels.HistoryViewModel"
+            />
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        >
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            >
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_history"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:historyList="@{viewModel.historyList}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                />
+            <TextView
+                android:id="@+id/textView_history_isEmpty"
+                android:gravity="center"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:text="@string/history_noHistoryMessage"
+                android:textSize="@dimen/history_noHistoryMessage_textSize"
+                android:visibility="gone"
+                />
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_history_toCamera"
+            android:contentDescription="@string/history_fab_contentDescription"
+            android:layout_gravity="end|bottom"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/history_fab_margin"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_baseline_camera_24"
+            app:backgroundTint="@color/purple_500"
+            app:tint="@color/white"
+            />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
