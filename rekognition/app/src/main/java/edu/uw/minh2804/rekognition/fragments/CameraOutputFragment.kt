@@ -4,6 +4,7 @@ package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
