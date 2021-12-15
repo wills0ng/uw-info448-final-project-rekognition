@@ -19,10 +19,6 @@
     <string name="camera_output_result_not_found">No %1$s detected</string>
     <string name="internal_error_message">Something went wrong, please try again later.</string>
     <string name="take_picture">Take Picture</string>
-<<<<<<< HEAD
     <string name="internet_not_found">No internet detected</string>
-=======
-    <string name="require_internet">No internet detected</string>
     <string name="history_noHistoryMessage">No History</string>
->>>>>>> f531265b69df56c872519ff7155454284f137ba0
 </resources>
