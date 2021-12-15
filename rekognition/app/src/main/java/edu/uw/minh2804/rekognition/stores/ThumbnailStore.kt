@@ -14,7 +14,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 
 class Thumbnail(file: File) {
-    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scaleDown(ThumbnailSetting.MAX_DIMENSION)
+    val bitmap: Bitmap = BitmapFactory.decodeFile(file.toURI().path).scaleDown(ThumbnailSetting.MAX_DIMENSION).copy(Bitmap.Config.RGB_565, false)
     val orientation: String? = ExifInterface(file.absolutePath).getAttribute(ExifInterface.TAG_ORIENTATION)
 }
 

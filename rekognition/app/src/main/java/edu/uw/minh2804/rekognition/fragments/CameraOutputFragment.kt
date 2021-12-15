@@ -4,6 +4,7 @@ package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -16,8 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 import edu.uw.minh2804.rekognition.services.*
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
@@ -114,21 +115,20 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
     // https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html
     private fun requireSpeechEngine() {
-        lifecycleScope.launch {
-            val checkIntent = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                    speechEngine = TextToSpeech(requireContext()) {}
-                } else {
-                    val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
-                    startActivity(installIntent)
-                }
-            } .run { launch(checkIntent) }
-        }
+        val checkIntent = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                speechEngine = TextToSpeech(requireContext()) {}
+            } else {
+                val installIntent = Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+                startActivity(installIntent)
+            }
+        } .run { launch(checkIntent) }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        speechEngine?.shutdown()
         viewVisibilityScope.cancel()
     }
 

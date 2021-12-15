@@ -33,12 +33,12 @@ class HistoryViewModel : ViewModel() {
     /**
      * Populate the history list from stored data.
      */
-    suspend fun populateHistoryList(
+    suspend fun updateHistoryList(
         photoStore: PhotoStore,
         thumbnailStore: ThumbnailStore,
         annotationStore: AnnotationStore
     ) {
-        Log.d(TAG, "Initializing the history list")
+        Log.d(TAG, "Updating the history list")
         // Note: treat photo store as source of truth since users can delete photos
         // Then look up thumbnails and annotations
         _historyList.value = photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
@@ -50,6 +50,7 @@ class HistoryViewModel : ViewModel() {
 
             HistoryItem(id, date, photoUri, thumbnailUri, annotation)
         }
+        Log.d(TAG, "Finished updating history list")
     }
 
     private fun parseAnnotation(savedAnnotation: SavedItem<Annotation>?): AnnotationPair {

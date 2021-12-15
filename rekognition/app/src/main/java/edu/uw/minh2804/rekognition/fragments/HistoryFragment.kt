@@ -25,6 +25,10 @@ import kotlinx.coroutines.launch
 class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
     private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
+    private lateinit var binding: FragmentHistoryBinding
+    private lateinit var photoStore: PhotoStore
+    private lateinit var thumbnailStore: ThumbnailStore
+    private lateinit var annotationStore: AnnotationStore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +37,7 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "HistoryFragment created")
 
         // Inflate the layout for this fragment with data binding
-        val binding = FragmentHistoryBinding.inflate(inflater)
+        binding = FragmentHistoryBinding.inflate(inflater)
 
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.lifecycleOwner = this
@@ -58,11 +62,32 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "Getting results from ImageProcessingStore")
 
         // IMPORTANT: Stores can only be initialized after onViewCreated lifecycle
-        val photoStore = PhotoStore(requireActivity())
-        val annotationStore = AnnotationStore(requireActivity())
-        val thumbnailStore = ThumbnailStore(requireActivity())
+        photoStore = PhotoStore(requireActivity())
+        annotationStore = AnnotationStore(requireActivity())
+        thumbnailStore = ThumbnailStore(requireActivity())
+
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.populateHistoryList(photoStore, thumbnailStore, annotationStore)
+            refreshHistory()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "Fragment resumed")
+        viewLifecycleOwner.lifecycleScope.launch {
+            refreshHistory()
+        }
+    }
+
+    private suspend fun refreshHistory() {
+        viewModel.updateHistoryList(photoStore, thumbnailStore, annotationStore)
+        viewModel.historyList.value?.let {
+            Log.v(TAG, "The size of the current history list is: ${it.size}")
+            if(it.isEmpty()) {
+                binding.textViewHistoryIsEmpty?.visibility = View.VISIBLE
+            } else {
+                binding.textViewHistoryIsEmpty?.visibility = View.GONE
+            }
         }
     }
 
