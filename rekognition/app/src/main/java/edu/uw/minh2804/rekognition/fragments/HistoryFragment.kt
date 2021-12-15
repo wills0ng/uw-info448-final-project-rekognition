@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
     private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
+    private lateinit var binding: FragmentHistoryBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +34,7 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "HistoryFragment created")
 
         // Inflate the layout for this fragment with data binding
-        val binding = FragmentHistoryBinding.inflate(inflater)
+        binding = FragmentHistoryBinding.inflate(inflater)
 
         // Allows Data Binding to Observe LiveData with the lifecycle of this Fragment
         binding.lifecycleOwner = this
@@ -63,6 +64,13 @@ class HistoryFragment : Fragment() {
         val thumbnailStore = ThumbnailStore(requireActivity())
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.populateHistoryList(photoStore, thumbnailStore, annotationStore)
+        }
+        viewModel.historyList.value?.let {
+            if(it.isEmpty()) {
+                binding.textViewHistoryIsEmpty?.visibility = View.VISIBLE
+            } else {
+                binding.textViewHistoryIsEmpty?.visibility = View.GONE
+            }
         }
     }
 
