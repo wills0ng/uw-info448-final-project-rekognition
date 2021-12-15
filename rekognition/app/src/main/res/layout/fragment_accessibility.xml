@@ -5,13 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:context=".fragments.CameraSurfaceProviderFragment"
+    tools:context=".fragments.AccessibilityFragment"
     >
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_camera_navigation"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:elevation="1dp"
         app:layout_constraintTop_toTopOf="parent"
         >
         <com.google.android.material.tabs.TabItem
@@ -26,23 +25,23 @@
             android:text="@string/camera_image_labeling"
             />
     </com.google.android.material.tabs.TabLayout>
-    <androidx.camera.view.PreviewView
-        android:id="@+id/preview_camera_finder"
-        android:layout_width="match_parent"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/CameraFragment"
         android:layout_height="0dp"
-        android:elevation="-1dp"
         android:layout_weight="1"
-        app:layout_constraintTop_toBottomOf="@id/tab_layout_camera_navigation"
+        android:layout_width="match_parent"
+        android:name="edu.uw.minh2804.rekognition.fragments.CameraFragment"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout_camera_navigation"
         />
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_output"
+        android:id="@+id/CameraOutputFragment"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:name="edu.uw.minh2804.rekognition.fragments.CameraOutputFragment"
+        android:layout_width="match_parent"
+        android:name="edu.uw.minh2804.rekognition.fragments.AnnotationFragment"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/button_camera_capture"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
     <ImageButton
@@ -50,11 +49,11 @@
         android:background="@drawable/ic_baseline_camera_24"
         android:elevation="2dp"
         android:layout_height="70dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
         android:layout_width="70dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:contentDescription="@string/take_picture"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

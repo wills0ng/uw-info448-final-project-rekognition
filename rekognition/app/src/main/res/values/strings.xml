@@ -1,8 +1,5 @@
 <!-- I learned about these file-level constants from https://stackoverflow.com/questions/4746058/reference-one-string-from-another-string-in-strings-xml -->
-<!DOCTYPE resources [
-    <!ENTITY appname "Rekognition">
-    <!ENTITY image_labeling "Object">
-    ]>
+<!DOCTYPE resources [<!ENTITY appname "Rekognition"><!ENTITY image_labeling "Object">]>
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Rekognition</string>
@@ -20,7 +17,7 @@
     <string name="history_fab_contentDescription">Go To Camera</string>
     <string name="camera_output_on_processing">Processing…</string>
     <string name="camera_output_result_not_found">No %1$s detected</string>
-    <string name="camera_output_internal_error">Something went wrong, please try again later.</string>
+    <string name="internal_error_message">Something went wrong, please try again later.</string>
     <string name="take_picture">Take Picture</string>
-    <string name="require_internet">No internet detected</string>
+    <string name="internet_not_found">No internet detected</string>
 </resources>

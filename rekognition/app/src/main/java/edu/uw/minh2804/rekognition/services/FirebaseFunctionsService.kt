@@ -49,8 +49,8 @@ object FirebaseFunctionsService {
     private const val TAG = "FirebaseFunctionsService"
     private val functions = Firebase.functions
 
-    enum class Endpoint : Annotator {
-        TEXT {
+    enum class Annotator : edu.uw.minh2804.rekognition.services.Annotator {
+        Text {
             override fun getResultType(context: Context): String {
                 return context.getString(R.string.camera_text_recognition)
             }
@@ -61,7 +61,7 @@ object FirebaseFunctionsService {
                 "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
             )
         },
-        OBJECT {
+        Object {
             override fun getResultType(context: Context): String {
                 return context.getString(R.string.camera_image_labeling)
             }
