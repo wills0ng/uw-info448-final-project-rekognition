@@ -22,4 +22,5 @@
     <string name="camera_output_result_not_found">No %1$s detected</string>
     <string name="camera_output_internal_error">Something went wrong, please try again later.</string>
     <string name="take_picture">Take Picture</string>
+    <string name="require_internet">No internet detected</string>
 </resources>

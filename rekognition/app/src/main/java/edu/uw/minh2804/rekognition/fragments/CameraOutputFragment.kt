@@ -3,7 +3,9 @@
 package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -19,7 +21,6 @@ import edu.uw.minh2804.rekognition.extensions.requestPermission
 import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
-import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
@@ -28,19 +29,15 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     private val model: CameraViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireFirebaseOrShutdown()
-        requireSpeechEngine()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireFirebaseOrIgnore()
+        requireSpeechEngine()
 
         thumbnailStore = ThumbnailStore(requireActivity())
         val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
-
         model.displayMessage.observe(this) {
             displayMessageInFixedDuration(outputView, it)
         }
@@ -49,37 +46,43 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
             if (!cameraOutput.isProcessed) {
                 lifecycleScope.launch {
                     val id = cameraOutput.id
-                    val processing = getString(R.string.camera_output_on_processing)
-                    speak(id, processing)
-                    displayMessageInFixedDuration(outputView, processing)
-                    val thumbnail = Thumbnail(cameraOutput.image)
-                    launch { thumbnailStore.save(cameraOutput.id, thumbnail) }
-                    try {
-                        // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
-                        withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
-                            val result = cameraOutput.requestAnnotator.annotate(thumbnail.bitmap)
-                            val formattedResult = cameraOutput.requestAnnotator.formatResult(result)
-                            if (formattedResult != null) {
-                                speak(id, formattedResult)
-                                model.onImageAnnotated(formattedResult)
-                                annotationStore.save(cameraOutput.id, Annotation(result))
-                            } else {
-                                val errorToDisplay = getString(
-                                    R.string.camera_output_result_not_found,
-                                    cameraOutput.requestAnnotator.getResultType(requireContext())
-                                )
-                                speak(id, errorToDisplay)
-                                model.onImageAnnotated(errorToDisplay)
+                    if (isInternetEnable()) {
+                        val processing = getString(R.string.camera_output_on_processing)
+                        speak(id, processing)
+                        displayMessageInFixedDuration(outputView, processing)
+                        val thumbnail = Thumbnail(cameraOutput.image)
+                        launch { thumbnailStore.save(cameraOutput.id, thumbnail) }
+                        try {
+                            // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
+                            withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
+                                val result = cameraOutput.requestAnnotator.annotate(thumbnail.bitmap)
+                                val formattedResult = cameraOutput.requestAnnotator.formatResult(result)
+                                if (formattedResult != null) {
+                                    speak(id, formattedResult)
+                                    model.onImageAnnotated(formattedResult)
+                                    annotationStore.save(cameraOutput.id, Annotation(result))
+                                } else {
+                                    val errorToDisplay = getString(
+                                        R.string.camera_output_result_not_found,
+                                        cameraOutput.requestAnnotator.getResultType(requireContext())
+                                    )
+                                    speak(id, errorToDisplay)
+                                    model.onImageAnnotated(errorToDisplay)
+                                }
                             }
+                        } catch (e: Exception) {
+                            Log.e(TAG, e.toString())
+                            val errorToDisplay = getString(R.string.camera_output_internal_error)
+                            speak(id, errorToDisplay)
+                            displayMessageInFixedDuration(outputView, errorToDisplay)
+                            model.onImageAnnotateFailed(errorToDisplay)
                         }
-                    } catch (e: Exception) {
-                        Log.e(TAG, e.toString())
-                        val errorToDisplay = getString(R.string.camera_output_internal_error)
-                        speak(id, errorToDisplay)
-                        displayMessageInFixedDuration(outputView, errorToDisplay)
-                        model.onImageAnnotateFailed(errorToDisplay)
+                        cameraOutput.isProcessed = true
+                    } else {
+                        val requireInternet = getString(R.string.require_internet)
+                        speak(id, requireInternet)
+                        displayMessageInFixedDuration(outputView, requireInternet)
                     }
-                    cameraOutput.isProcessed = true
                 }
             }
         }
@@ -101,13 +104,17 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         }
     }
 
-    private fun requireFirebaseOrShutdown() {
+    // https://developer.android.com/training/monitoring-device-state/connectivity-status-type
+    private fun isInternetEnable(): Boolean {
+        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetwork != null
+    }
+
+    private fun requireFirebaseOrIgnore() {
         lifecycleScope.launch {
             val requiredPermission = Manifest.permission.INTERNET
             if (!requireActivity().isPermissionGranted(requiredPermission)) {
-                if (!requireActivity().requestPermission(requiredPermission)) {
-                    requireActivity().finish()
-                }
+                requireActivity().requestPermission(requiredPermission)
             }
             if (!FirebaseAuthService.isSignedIn()) {
                 FirebaseAuthService.signIn()
