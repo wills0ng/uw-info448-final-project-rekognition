@@ -35,9 +35,11 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
 
         requireFirebaseOrIgnore()
 
+        // Initialize local storage endpoints
         annotationStore = AnnotationStore(requireActivity())
         thumbnailStore = ThumbnailStore(requireActivity())
 
+        // Observe newly captured photos
         model.capturedPhoto.observe(this) {  if (!it.isProcessed) annotate(it) }
     }
 
@@ -95,6 +97,6 @@ class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
     }
 
     companion object {
-        private const val TAG = "CameraOutputFragment"
+        private val TAG = AnnotationFragment::class.simpleName
     }
 }

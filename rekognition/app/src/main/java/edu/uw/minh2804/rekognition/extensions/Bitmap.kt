@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 
+// Scale down the width and height of a bitmap to be at most equal to maxDimension, preserving
+// aspect ratio
 fun Bitmap.scaleDown(maxDimension: Int): Bitmap {
     val originalWidth = this.width
     val originalHeight = this.height

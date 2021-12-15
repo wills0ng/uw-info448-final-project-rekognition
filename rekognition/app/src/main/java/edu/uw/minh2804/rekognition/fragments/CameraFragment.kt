@@ -95,6 +95,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     companion object {
-        private const val TAG = "CameraFragment"
+        private val TAG = CameraFragment::class.simpleName
     }
 }

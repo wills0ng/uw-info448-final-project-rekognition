@@ -69,6 +69,6 @@ class AccessibilityFragment : Fragment(R.layout.fragment_accessibility) {
     }
 
     companion object {
-        private const val TAG = "RecognitionFragment"
+        private val TAG = AccessibilityFragment::class.simpleName
     }
 }
