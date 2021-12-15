@@ -26,10 +26,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlinx.coroutines.launch
 
-class CameraOutput(file: File) {
-    val photo = Photo(file)
-    val thumbnail = Thumbnail(photo.file)
-}
+data class CameraOutput(val id: String, val image: File, val requestAnnotator: Annotator)
 
 // CameraFragment class is taken and modified from https://developer.android.com/codelabs/camerax-getting-started#0
 class CameraFragment : Fragment(R.layout.fragment_camera) {
@@ -44,33 +41,53 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         requireCameraOrShutdown()
 
-        view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener { takePhoto() }
+        val tabs = view.findViewById<TabLayout>(R.id.tab_layout_camera_navigation)
 
-        view.findViewById<TabLayout>(R.id.tab_layout_camera_navigation).addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab?) {
-                    Log.v(TAG, "${tab!!.text.toString()} tab selected")
-                    model.onSetCameraTab(
-                        when (tab!!.text) {
-                            getString(R.string.camera_text_recognition) -> FirebaseFunctionsService.Endpoint.TEXT
-                            getString(R.string.camera_image_labeling) -> FirebaseFunctionsService.Endpoint.OBJECT
-                            else -> {
-                                Log.e(TAG, "Tab label ${tab.text} inconsistent with resources")
-                                Log.v(TAG, "Setting firebase endpoint to default: TEXT")
-                                FirebaseFunctionsService.Endpoint.TEXT
-                            }
-                        }
-                    )
-                }
+        model.tabPosition.observe(this) {
+            tabs.selectTab(tabs.getTabAt(it))
+        }
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) { model.onTabPositionChanged(tab!!.position) }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
+        view.findViewById<ImageButton>(R.id.button_camera_capture).setOnClickListener {
+            val outputFile = photoStore.createOutputFile()
+            val id = outputFile.nameWithoutExtension
+            when (tabs.selectedTabPosition) {
+                0 -> takePhoto(CameraOutput(id, outputFile, FirebaseFunctionsService.Endpoint.TEXT))
+                1 -> takePhoto(CameraOutput(id, outputFile, FirebaseFunctionsService.Endpoint.OBJECT))
+                else -> Log.e(TAG, "Selected tab position not found")
             }
-        )
+        }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         photoStore = PhotoStore(requireActivity())
+    }
+
+    private fun takePhoto(output: CameraOutput) {
+        if (imageCapture == null || !FirebaseAuthService.isSignedIn()) return
+
+        model.onCameraCapturing()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(output.image).build()
+
+        imageCapture!!.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(requireContext()),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(results: ImageCapture.OutputFileResults) {
+                    model.onCameraCaptured(output)
+                    lifecycleScope.launch { photoStore.save(output.id, Photo(output.image)) }
+                }
+
+                override fun onError(e: ImageCaptureException) {
+                    Log.e(TAG, "Photo save failed: ${e.message}", e)
+                    model.onCameraCaptureFailed()
+                }
+            }
+        )
     }
 
     private fun startCamera() {
@@ -95,30 +112,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         } catch(e: Exception) {
             Log.e(TAG, "Use case binding failed", e)
         }
-    }
-
-    private fun takePhoto() {
-        if (imageCapture == null || !FirebaseAuthService.isSignedIn()) return
-
-        model.onCameraCapturing()
-
-        val outputFile = photoStore.createOutputFile()
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(outputFile).build()
-
-        imageCapture!!.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(requireContext()),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    model.onCameraCaptured(CameraOutput(outputFile))
-                }
-
-                override fun onError(e: ImageCaptureException) {
-                    Log.e(TAG, "Photo save failed: ${e.message}", e)
-                    model.onCameraCaptureFailed()
-                }
-            }
-        )
     }
 
     private fun requireCameraOrShutdown() {

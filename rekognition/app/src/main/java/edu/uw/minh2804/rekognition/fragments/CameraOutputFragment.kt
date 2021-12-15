@@ -4,7 +4,6 @@ package edu.uw.minh2804.rekognition.fragments
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -18,16 +17,15 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
 import edu.uw.minh2804.rekognition.services.*
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
+import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
-import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.viewmodels.CameraState
 import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
 import kotlinx.coroutines.*
 
 class CameraOutputFragment : Fragment(R.layout.fragment_output) {
+    private lateinit var thumbnailStore: ThumbnailStore
     private val model: CameraViewModel by activityViewModels()
-    private var currentEndpoint: Endpoint = Endpoint.TEXT
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
     private var speechEngine: TextToSpeech? = null
 
@@ -37,13 +35,9 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         requireFirebaseOrShutdown()
         requireSpeechEngine()
 
+        thumbnailStore = ThumbnailStore(requireActivity())
         val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
-
-        model.firebaseEndpoint.observe(this) {
-            Log.v(TAG, "Changing endpoint to: $it")
-            currentEndpoint = it
-        }
 
         model.cameraState.observe(this) {
             if (it == CameraState.CAPTURING) {
@@ -55,12 +49,14 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
 
         model.capturedPhoto.observe(this) {
             lifecycleScope.launch {
-                val id = it.photo.file.nameWithoutExtension
+                val id = it.id
+                val thumbnail = Thumbnail(it.image)
+                launch { thumbnailStore.save(it.id, thumbnail) }
                 try {
                     // If it takes more than 10 seconds to retrieve the result, then a TimeoutCancellationException will be thrown.
                     withTimeout(1000 * CONNECTION_TIMEOUT_IN_SECONDS) {
-                        val result = currentEndpoint.annotate(it.thumbnail.bitmap)
-                        val formattedResult = currentEndpoint.formatResult(result)
+                        val result = it.requestAnnotator.annotate(thumbnail.bitmap)
+                        val formattedResult = it.requestAnnotator.formatResult(result)
                         formattedResult?.let { resultToDisplay ->
                             displayViewInFixedDuration(outputView, resultToDisplay)
                             speechEngine?.speak(resultToDisplay, TextToSpeech.QUEUE_ADD, null, id)
@@ -69,7 +65,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
                         } ?: run {
                             val errorToDisplay = getString(
                                 R.string.camera_output_result_not_found,
-                                currentEndpoint.getResultType(requireContext())
+                                it.requestAnnotator.getResultType(requireContext())
                             )
                             displayViewInFixedDuration(outputView, errorToDisplay)
                             speechEngine?.speak(errorToDisplay, TextToSpeech.QUEUE_ADD, null, id)

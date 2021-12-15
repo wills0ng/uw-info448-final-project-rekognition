@@ -4,16 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Endpoint
 
 enum class CameraState {
     CAPTURING, CAPTURED, IDLE
 }
 
 class CameraViewModel : ViewModel() {
-    private val _firebaseEndpoint = MutableLiveData<Endpoint>()
-    val firebaseEndpoint: LiveData<Endpoint>
-        get() = _firebaseEndpoint
+    private val _tabPosition = MutableLiveData<Int>()
+    val tabPosition: LiveData<Int>
+        get() = _tabPosition
 
     private val _cameraState = MutableLiveData<CameraState>()
     val cameraState: LiveData<CameraState>
@@ -23,8 +22,8 @@ class CameraViewModel : ViewModel() {
     val capturedPhoto: LiveData<CameraOutput>
         get() = _capturedPhoto
 
-    fun onSetCameraTab(endpoint: Endpoint) {
-        _firebaseEndpoint.value = endpoint
+    fun onTabPositionChanged(index: Int) {
+        _tabPosition.value = index
     }
 
     fun onCameraCapturing() {
