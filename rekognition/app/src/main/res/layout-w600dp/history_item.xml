@@ -24,14 +24,14 @@
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
                 android:src="@{item.thumbnailUri}"
-                android:contentDescription="@{item.annotation}" />
+                android:contentDescription="@{item.annotation.text}" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:padding="15dp"
                 android:textSize="20sp"
-                android:text="@{item.annotation}" />
+                android:text="@{item.annotation.text}" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
