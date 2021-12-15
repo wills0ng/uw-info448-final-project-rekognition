@@ -26,9 +26,6 @@ class HistoryFragment : Fragment() {
     // Initialize a nav graph scoped ViewModel
     private val viewModel: HistoryViewModel by navGraphViewModels(R.id.nav_graph_history)
     private lateinit var binding: FragmentHistoryBinding
-    private lateinit var photoStore: PhotoStore
-    private lateinit var thumbnailStore: ThumbnailStore
-    private lateinit var annotationStore: AnnotationStore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,10 +59,11 @@ class HistoryFragment : Fragment() {
         Log.d(TAG, "Getting results from ImageProcessingStore")
 
         // IMPORTANT: Stores can only be initialized after onViewCreated lifecycle
-        photoStore = PhotoStore(requireActivity())
-        annotationStore = AnnotationStore(requireActivity())
-        thumbnailStore = ThumbnailStore(requireActivity())
-
+        viewModel.setDataStores(
+            PhotoStore(requireActivity()),
+            ThumbnailStore(requireActivity()),
+            AnnotationStore(requireActivity())
+        )
         viewLifecycleOwner.lifecycleScope.launch {
             refreshHistory()
         }
@@ -80,7 +78,7 @@ class HistoryFragment : Fragment() {
     }
 
     private suspend fun refreshHistory() {
-        viewModel.updateHistoryList(photoStore, thumbnailStore, annotationStore)
+        viewModel.updateHistoryList()
         viewModel.historyList.value?.let {
             Log.v(TAG, "The size of the current history list is: ${it.size}")
             if(it.isEmpty()) {

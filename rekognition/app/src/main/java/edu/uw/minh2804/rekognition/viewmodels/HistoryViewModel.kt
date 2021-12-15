@@ -21,6 +21,9 @@ import java.util.*
  * and the associated detected text / objects.
  */
 class HistoryViewModel : ViewModel() {
+    private lateinit var _photoStore: PhotoStore
+    private lateinit var _thumbnailStore: ThumbnailStore
+    private lateinit var _annotationStore: AnnotationStore
 
     private val _historyList = MutableLiveData<List<HistoryItem>>()
     val historyList : LiveData<List<HistoryItem>>
@@ -31,26 +34,47 @@ class HistoryViewModel : ViewModel() {
     }
 
     /**
-     * Populate the history list from stored data.
+     * Set the data stores used by the ViewModel.
      */
-    suspend fun updateHistoryList(
+    fun setDataStores(
         photoStore: PhotoStore,
         thumbnailStore: ThumbnailStore,
         annotationStore: AnnotationStore
     ) {
+       _photoStore = photoStore
+       _thumbnailStore = thumbnailStore
+       _annotationStore = annotationStore
+    }
+
+    /**
+     * Populate the history list from stored data.
+     */
+    suspend fun updateHistoryList() {
         Log.d(TAG, "Updating the history list")
         // Note: treat photo store as source of truth since users can delete photos
         // Then look up thumbnails and annotations
-        _historyList.value = photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
+        _historyList.value = _photoStore.items.sortedByDescending{ it.value.id }.map { photo ->
             val id = photo.value.id
             val date = SimpleDateFormat(PhotoStore.FILENAME_FORMAT, Locale.US).parse(id)
             val photoUri = Uri.fromFile(photo.value.item.file)
-            val thumbnailUri = thumbnailStore.getUri(id)
-            val annotation = parseAnnotation(annotationStore.findItem(id))
+            val thumbnailUri = _thumbnailStore.getUri(id)
+            val annotation = parseAnnotation(_annotationStore.findItem(id))
 
             HistoryItem(id, date, photoUri, thumbnailUri, annotation)
         }
         Log.d(TAG, "Finished updating history list")
+    }
+
+    fun doesItemExist(id: String): Boolean {
+        var itemExists = false
+        _historyList.value?.let {
+            for (item in it) {
+                if (item.id == id) {
+                    itemExists = true
+                }
+            }
+        }
+        return itemExists
     }
 
     private fun parseAnnotation(savedAnnotation: SavedItem<Annotation>?): AnnotationPair {
