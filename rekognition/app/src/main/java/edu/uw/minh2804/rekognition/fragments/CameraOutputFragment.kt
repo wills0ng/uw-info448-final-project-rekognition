@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import edu.uw.minh2804.rekognition.MainActivity.Companion.CONNECTION_TIMEOUT_IN_SECONDS
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.extensions.isPermissionGranted
 import edu.uw.minh2804.rekognition.extensions.requestPermission
@@ -33,11 +34,13 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
         super.onViewCreated(view, savedInstanceState)
 
         requireFirebaseOrIgnore()
-        requireSpeechEngine()
+        requireSpeechEngineOrIgnore()
 
         thumbnailStore = ThumbnailStore(requireActivity())
+
         val annotationStore = AnnotationStore(requireActivity())
         val outputView = view.findViewById<TextView>(R.id.text_output_overlay)
+
         model.displayMessage.observe(this) {
             displayMessageInFixedDuration(outputView, it)
         }
@@ -123,7 +126,7 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     }
 
     // https://android-developers.googleblog.com/2009/09/introduction-to-text-to-speech-in.html
-    private fun requireSpeechEngine() {
+    private fun requireSpeechEngineOrIgnore() {
         val checkIntent = Intent(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA)
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
@@ -141,7 +144,6 @@ class CameraOutputFragment : Fragment(R.layout.fragment_output) {
     }
 
     companion object {
-        const val CONNECTION_TIMEOUT_IN_SECONDS = 10L
         const val TEXT_DISPLAY_DURATION_IN_SECONDS = 5L
         private const val TAG = "CameraOutputFragment"
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
+import java.lang.Exception
 
 enum class CameraState {
     CAPTURING, CAPTURED, IDLE
@@ -40,6 +41,9 @@ class CameraViewModel : ViewModel() {
     fun onCameraCaptured(photo: CameraOutput) {
         _cameraState.value = CameraState.CAPTURED
         _capturedPhoto.value = photo
+    }
+
+    fun onCameraCaptured(e: Exception) {
     }
 
     fun onCameraCaptureFailed() {
