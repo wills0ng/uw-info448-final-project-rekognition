@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.lifecycle.*
 import edu.uw.minh2804.rekognition.models.AnnotationPair
 import edu.uw.minh2804.rekognition.models.HistoryItem
-import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Annotator.Object
+import edu.uw.minh2804.rekognition.services.FirebaseFunctionsService.Annotator.OBJECT
 import edu.uw.minh2804.rekognition.stores.Annotation
 import edu.uw.minh2804.rekognition.stores.AnnotationStore
 import edu.uw.minh2804.rekognition.stores.PhotoStore
@@ -83,7 +83,7 @@ class HistoryViewModel : ViewModel() {
                 this.fullTextAnnotation?.let { textAnnotation ->
                     AnnotationPair("Text", textAnnotation.text)
                 } ?:
-                    AnnotationPair("Objects", Object.formatResult(this))
+                    AnnotationPair("Objects", OBJECT.onAnnotated(this))
             }
         } ?: AnnotationPair("No Result", null)
     }

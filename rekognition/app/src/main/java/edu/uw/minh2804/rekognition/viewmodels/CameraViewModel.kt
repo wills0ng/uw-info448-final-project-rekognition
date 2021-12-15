@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.viewmodels
 
 import android.speech.tts.TextToSpeech
@@ -7,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
 import java.lang.Exception
 
+// This view model is responsible for maintaining data and state of the current AccessibilityActivity.
 class CameraViewModel : ViewModel() {
     var speechEngine: TextToSpeech? = null
 

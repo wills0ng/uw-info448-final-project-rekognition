@@ -6,7 +6,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,7 +14,6 @@ import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.databinding.HistoryItemBinding
 import edu.uw.minh2804.rekognition.fragments.HistoryFragmentDirections
 import edu.uw.minh2804.rekognition.models.HistoryItem
-
 
 // ListAdapter for the History RecyclerView
 class HistoryItemAdapter : ListAdapter<HistoryItem, HistoryItemAdapter.ViewHolder>(DiffCallback()) {

@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.stores
 
 import android.os.Parcelable
@@ -15,6 +17,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Annotation(val result: AnnotateImageResponse) : Parcelable
 
+// This store is responsible for reading and writing annotation data to the device's internal storage.
 class AnnotationStore(private val context: FragmentActivity) : ItemStore<Annotation> {
     private val directory: File by lazy {
         context.filesDir.let { appDirectory ->

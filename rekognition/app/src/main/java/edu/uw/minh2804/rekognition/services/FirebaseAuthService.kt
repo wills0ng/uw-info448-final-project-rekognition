@@ -7,6 +7,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+// This service is responsible for handling all of the authentication with Firebase.
 object FirebaseAuthService {
     private val AUTH = Firebase.auth
 
@@ -18,7 +19,7 @@ object FirebaseAuthService {
         }
     }
 
-    fun isSignedIn(): Boolean {
+    fun isAuthenticated(): Boolean {
         return AUTH.currentUser != null
     }
 }
