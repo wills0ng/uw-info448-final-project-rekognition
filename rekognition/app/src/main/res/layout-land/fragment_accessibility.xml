@@ -8,22 +8,23 @@
     tools:context=".fragments.AccessibilityFragment"
     >
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_camera_navigation"
-        android:elevation="1dp"
+        android:id="@+id/tab_layout_annotation_options"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
         >
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/camera_text_recognition"
+            android:text="@string/tab_item_text_annotation"
             />
 
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="@string/camera_image_labeling"
+            android:text="@string/tab_item_object_annotation"
             />
     </com.google.android.material.tabs.TabLayout>
     <androidx.fragment.app.FragmentContainerView
@@ -34,7 +35,7 @@
         android:layout_width="match_parent"
         android:name="edu.uw.minh2804.rekognition.fragments.CameraFragment"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tab_layout_camera_navigation"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout_annotation_options"
         />
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/CameraOutputFragment"

@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/CameraFragment"
+    app:startDestination="@id/AccessibilityFragment"
     >
     <fragment
-        android:id="@+id/CameraFragment"
-        android:label="@string/camera_label"
+        android:id="@+id/AccessibilityFragment"
+        android:label="@string/accessibility_label"
         android:name="edu.uw.minh2804.rekognition.fragments.AccessibilityFragment"
         tools:layout="@layout/fragment_accessibility"
         />

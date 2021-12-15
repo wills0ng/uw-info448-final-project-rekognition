@@ -6,7 +6,7 @@
         android:id="@+id/miCamera"
         android:icon="@drawable/ic_camera"
         app:showAsAction="ifRoom"
-        android:title="@string/camera_label"
+        android:title="@string/accessibility_label"
         />
 
 </menu>

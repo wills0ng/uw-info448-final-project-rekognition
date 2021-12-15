@@ -37,7 +37,7 @@ object FirebaseFunctionsService {
             // The string resource labelling each tab in the camera activity is a unique identifier
             // of the endpoint, and is widely accessible across the code base.
             override fun getType(context: Context): String {
-                return context.getString(R.string.camera_text_recognition)
+                return context.getString(R.string.tab_item_text_annotation)
             }
 
             override fun onAnnotated(result: AnnotateImageResponse): String? {
@@ -50,7 +50,7 @@ object FirebaseFunctionsService {
         },
         OBJECT {
             override fun getType(context: Context): String {
-                return context.getString(R.string.camera_image_labeling)
+                return context.getString(R.string.tab_item_object_annotation)
             }
 
             override fun onAnnotated(result: AnnotateImageResponse): String? {

@@ -32,7 +32,7 @@ class AccessibilityFragment : Fragment(R.layout.fragment_accessibility) {
         photoStore = PhotoStore(requireActivity())
 
         val captureButton = view.findViewById<ImageButton>(R.id.button_camera_capture)
-        val optionsTab = view.findViewById<TabLayout>(R.id.tab_layout_camera_navigation)
+        val optionsTab = view.findViewById<TabLayout>(R.id.tab_layout_annotation_options)
 
         // Direct captured photos to the endpoint corresponding to the selected tab 'Text' or
         // 'Object'
