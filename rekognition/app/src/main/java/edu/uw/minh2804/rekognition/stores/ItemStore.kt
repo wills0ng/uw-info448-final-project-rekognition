@@ -14,5 +14,8 @@ data class SavedItem<T>(
 interface ItemStore<T> {
     val items: List<Lazy<SavedItem<T>>>
     suspend fun findItem(id: String): SavedItem<T>?
+
+    // Save the item into store with the id attached.
+    // Returns a SavedItem wrapper as indicator of success, else throw exceptions.
     suspend fun save(id: String, item: T): SavedItem<T>
 }

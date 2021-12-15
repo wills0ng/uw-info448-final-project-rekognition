@@ -38,6 +38,8 @@ class PhotoStore(private val context: FragmentActivity) : ItemStore<Photo> {
         }
     }
 
+    // Save the item into internal storage, with the id as file name.
+    // Returns a SavedItem wrapper as indicator of success, else throw exceptions.
     override suspend fun save(id: String, item: Photo): SavedItem<Photo> {
         return withContext(context.lifecycleScope.coroutineContext) { SavedItem(id, item) }
     }
