@@ -7,10 +7,6 @@ import androidx.lifecycle.ViewModel
 import edu.uw.minh2804.rekognition.fragments.CameraOutput
 import java.lang.Exception
 
-enum class CameraState {
-    CAPTURING, CAPTURED, IDLE
-}
-
 class CameraViewModel : ViewModel() {
     var speechEngine: TextToSpeech? = null
 
@@ -18,46 +14,44 @@ class CameraViewModel : ViewModel() {
     val tabPosition: LiveData<Int>
         get() = _tabPosition
 
-    private val _cameraState = MutableLiveData<CameraState>()
-    val cameraState: LiveData<CameraState>
-        get() = _cameraState
-
     private val _capturedPhoto = MutableLiveData<CameraOutput>()
     val capturedPhoto: LiveData<CameraOutput>
         get() = _capturedPhoto
 
-    private val _displayMessage = MutableLiveData<String>()
-    val displayMessage: LiveData<String>
-        get() = _displayMessage
+    private val _messageToUser = MutableLiveData<String>()
+    val messageToUser: LiveData<String>
+        get() = _messageToUser
 
     fun onTabPositionChanged(index: Int) {
         _tabPosition.value = index
     }
 
-    fun onCameraCapturing() {
-        _cameraState.value = CameraState.CAPTURING
-    }
-
     fun onCameraCaptured(photo: CameraOutput) {
-        _cameraState.value = CameraState.CAPTURED
         _capturedPhoto.value = photo
     }
 
-    fun onCameraCaptured(e: Exception) {
+    fun onCameraCaptureFailed(displayMessage: String) {
+        _messageToUser.value = displayMessage
     }
 
-    fun onCameraCaptureFailed() {
-        _cameraState.value = CameraState.IDLE
+    fun onCameraCaptureFailed(e: Exception) {
+        onCameraCaptureFailed(e.message!!)
+    }
+
+    fun onImageAnnotating(displayMessage: String) {
+        _messageToUser.value = displayMessage
     }
 
     fun onImageAnnotated(displayMessage: String) {
-        _cameraState.value = CameraState.IDLE
-        _displayMessage.value = displayMessage
+        _messageToUser.value = displayMessage
     }
 
     fun onImageAnnotateFailed(displayMessage: String) {
-        _cameraState.value = CameraState.IDLE
-        _displayMessage.value = displayMessage
+        _messageToUser.value = displayMessage
+    }
+
+    fun onImageAnnotateFailed(e: Exception) {
+        onImageAnnotateFailed(e.message!!)
     }
 
     override fun onCleared() {

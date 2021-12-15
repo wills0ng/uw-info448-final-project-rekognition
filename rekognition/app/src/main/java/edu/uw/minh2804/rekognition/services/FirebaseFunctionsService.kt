@@ -54,8 +54,8 @@ object FirebaseFunctionsService {
 
     // This enum class encapsulates the differences between the text and object recognition
     // endpoints, allowing for code referencing these endpoints to be agnostic of these differences
-    enum class Endpoint : Annotator {
-        TEXT {
+    enum class Annotator : edu.uw.minh2804.rekognition.services.Annotator {
+        Text {
             // The string resource labelling each tab in the camera activity is a unique identifier
             // of the endpoint, and is widely accessible across the code base.
             override fun getResultType(context: Context): String {
@@ -68,7 +68,7 @@ object FirebaseFunctionsService {
                 "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
             )
         },
-        OBJECT {
+        Object {
             override fun getResultType(context: Context): String {
                 return context.getString(R.string.camera_image_labeling)
             }

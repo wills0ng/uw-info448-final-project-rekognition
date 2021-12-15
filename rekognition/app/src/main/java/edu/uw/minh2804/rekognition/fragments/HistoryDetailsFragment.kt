@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
-import edu.uw.minh2804.rekognition.CameraActivity
+import edu.uw.minh2804.rekognition.AccessibilityActivity
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.databinding.FragmentHistoryDetailsBinding
 import edu.uw.minh2804.rekognition.models.HistoryItem
@@ -47,7 +47,7 @@ class HistoryDetailsFragment : Fragment() {
 
         // Set click listener for the floating action button to go from history to camera
         binding.fabHistoryDetailsToCamera.setOnClickListener {
-            val intent = Intent(activity, CameraActivity::class.java)
+            val intent = Intent(activity, AccessibilityActivity::class.java)
             startActivity(intent)
         }
 

@@ -20,7 +20,7 @@
             android:name=".HistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".CameraActivity"
+            android:name=".AccessibilityActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
