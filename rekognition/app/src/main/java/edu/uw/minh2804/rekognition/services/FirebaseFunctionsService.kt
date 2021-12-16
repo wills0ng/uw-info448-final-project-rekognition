@@ -1,3 +1,5 @@
+/** Shane Fretwell: I was responsible for the contents of this file, except for the data classes which Tom implemented **/
+
 package edu.uw.minh2804.rekognition.services
 
 import android.content.Context

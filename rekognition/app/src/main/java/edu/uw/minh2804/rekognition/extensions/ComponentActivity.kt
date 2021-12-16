@@ -1,3 +1,5 @@
+/** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+
 package edu.uw.minh2804.rekognition.extensions
 
 import android.content.pm.PackageManager

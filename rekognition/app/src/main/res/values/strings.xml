@@ -1,4 +1,5 @@
-<!-- I learned about these file-level constants from https://stackoverflow.com/questions/4746058/reference-one-string-from-another-string-in-strings-xml -->
+<!-- Shane Fretwell: I learned about these file-level constants from https://stackoverflow.com/questions/4746058/reference-one-string-from-another-string-in-strings-xml -->
+<!-- I also organized the strings here -->
 <!DOCTYPE resources [<!ENTITY appname "Rekognition"><!ENTITY image_labeling "Object">]>
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">

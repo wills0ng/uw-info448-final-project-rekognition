@@ -1,3 +1,5 @@
+/** Shane Fretwell: I was responsible for the contents of this file and it's corresponding xml **/
+
 package edu.uw.minh2804.rekognition
 
 import android.os.Bundle

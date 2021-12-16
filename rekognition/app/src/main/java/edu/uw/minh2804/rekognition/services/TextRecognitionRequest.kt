@@ -1,3 +1,5 @@
+/** Shane Fretwell: I was responsible for the contents of this file, and Tom refactored it to use more concise syntax **/
+
 package edu.uw.minh2804.rekognition.services
 
 import com.google.gson.JsonArray

@@ -1,3 +1,4 @@
+<!-- Shane Fretwell: I was responsible for the changes in theme files from their defaults -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Rekognition.NoActionBar" parent="Theme.MaterialComponents.DayNight">

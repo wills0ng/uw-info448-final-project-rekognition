@@ -1,4 +1,5 @@
 /** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+/** Shane Fretwell: I added some state to this file to help track which firebase endpoint should be called **/
 
 package edu.uw.minh2804.rekognition.viewmodels
 

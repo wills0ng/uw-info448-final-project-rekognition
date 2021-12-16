@@ -1,4 +1,9 @@
 /** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+/**
+ * Shane Fretwell: I modified the try block of annotate() to be agnostic of which firebase endpoint
+ * is being called, which makes the code base more flexible if we wanted to add endpoints in the
+ * future
+ */
 
 package edu.uw.minh2804.rekognition.fragments
 

@@ -1,3 +1,9 @@
+/**
+ * Shane Fretwell: I implemented the scaling and conversion of images following the docs on Vision
+ * AI. Tom made that code more convenient by extending the existing Bitmap class here, and added
+ * image compression to the stringification function.
+ */
+
 package edu.uw.minh2804.rekognition.extensions
 
 import android.graphics.Bitmap

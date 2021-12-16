@@ -1,3 +1,6 @@
+/** Tom Nguyen: I wrote this file **/
+/** Shane Fretwell: I wrote it's corresponding xml file. */
+
 package edu.uw.minh2804.rekognition.fragments
 
 import android.content.Intent

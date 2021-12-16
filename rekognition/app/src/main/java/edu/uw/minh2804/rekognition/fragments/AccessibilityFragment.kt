@@ -1,4 +1,11 @@
 /** Tom Nguyen: I wrote this file and it's corresponding xml files. **/
+/**
+ * Shane Fretwell: I implemented the state in this file that keeps track of what tab is selected,
+ * and Tom made sure this state wasn't lost when landscape mode is engaged
+ * I also adapted the xml for this fragment for landscape mode, which involved substantial but
+ * fruitless research into vertical tab layouts and other methods of switching between Text and
+ * Object detection
+ */
 
 package edu.uw.minh2804.rekognition.fragments
 
