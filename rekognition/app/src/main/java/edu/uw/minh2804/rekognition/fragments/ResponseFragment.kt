@@ -11,9 +11,8 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import edu.uw.minh2804.rekognition.R
-import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
+import edu.uw.minh2804.rekognition.viewmodels.AccessibilityViewModel
 import kotlinx.coroutines.*
 
 // This fragment is responsible for outputting messages to the user.
@@ -21,7 +20,7 @@ import kotlinx.coroutines.*
 // In addition, if text to speech is supported by the android device,
 // then voice will also be outputted.
 class ResponseFragment : Fragment(R.layout.fragment_response) {
-    private val model: CameraViewModel by activityViewModels()
+    private val model: AccessibilityViewModel by activityViewModels()
     private val viewVisibilityScope = CoroutineScope(Dispatchers.Default)
 
     override fun onCreate(savedInstanceState: Bundle?) {

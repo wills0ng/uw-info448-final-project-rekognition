@@ -13,7 +13,7 @@ import com.google.android.material.tabs.TabLayout
 import edu.uw.minh2804.rekognition.R
 import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.*
-import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
+import edu.uw.minh2804.rekognition.viewmodels.AccessibilityViewModel
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -24,7 +24,7 @@ data class CameraOutput(val id: String, val image: File, val requestAnnotator: A
 // User input includes selecting one of the detection options and taking picture.
 class AccessibilityFragment : Fragment(R.layout.fragment_accessibility) {
     private lateinit var photoStore: PhotoStore
-    private val model: CameraViewModel by activityViewModels()
+    private val model: AccessibilityViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -18,7 +18,7 @@ import edu.uw.minh2804.rekognition.extensions.requestPermission
 import edu.uw.minh2804.rekognition.services.*
 import edu.uw.minh2804.rekognition.stores.*
 import edu.uw.minh2804.rekognition.stores.Annotation
-import edu.uw.minh2804.rekognition.viewmodels.CameraViewModel
+import edu.uw.minh2804.rekognition.viewmodels.AccessibilityViewModel
 import kotlinx.coroutines.*
 
 // This exception is used to throw when there is no internet connection.
@@ -28,7 +28,7 @@ class InternetNotFoundException : Exception("Internet not detected")
 class AnnotationFragment : Fragment(R.layout.fragment_annotation) {
     private lateinit var annotationStore: AnnotationStore
     private lateinit var thumbnailStore: ThumbnailStore
-    private val model: CameraViewModel by activityViewModels()
+    private val model: AccessibilityViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

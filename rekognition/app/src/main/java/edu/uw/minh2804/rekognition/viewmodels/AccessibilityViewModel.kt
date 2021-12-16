@@ -10,7 +10,7 @@ import edu.uw.minh2804.rekognition.fragments.CameraOutput
 import java.lang.Exception
 
 // This view model is responsible for maintaining data and state of the current AccessibilityActivity.
-class CameraViewModel : ViewModel() {
+class AccessibilityViewModel : ViewModel() {
     var speechEngine: TextToSpeech? = null
 
     private val _tabPosition = MutableLiveData<Int>()
