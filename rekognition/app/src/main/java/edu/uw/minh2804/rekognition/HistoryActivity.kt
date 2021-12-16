@@ -9,6 +9,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 
+// The History activity extends the functionality of the ActionBarActivity to support Toolbar up
+// navigation with a nav graph
 class HistoryActivity : ActionBarActivity(R.layout.activity_history, hideIcon = true) {
     private lateinit var navController: NavController
     private lateinit var appBarConfig : AppBarConfiguration
