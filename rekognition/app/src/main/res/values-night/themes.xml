@@ -1,17 +1,33 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <!-- TODO: Update night theme to reflect changes in light theme -->
-    <style name="Theme.Rekognition" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
+<!-- Base application theme. -->
+<style name="Theme.Rekognition.NoActionBar" parent="Theme.MaterialComponents.DayNight">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <!-- Primary brand color. -->
+    <item name="colorPrimary">@color/purple_200</item>
+    <item name="colorPrimaryVariant">@color/purple_700</item>
+    <item name="colorOnPrimary">@color/black</item>
+    <!-- Secondary brand color. -->
+    <item name="colorSecondary">@color/teal_200</item>
+    <item name="colorSecondaryVariant">@color/teal_200</item>
+    <item name="colorOnSecondary">@color/black</item>
+    <!-- Status bar color. -->
+    <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+    <!-- Customize your theme here. -->
+    <item name="android:textSize">18sp</item>
+</style>
+
+<style name="Theme.Rekognition"  parent="Theme.MaterialComponents.DayNight.DarkActionBar"/>
+
+<style name="Theme.Rekognition.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+<style name="Theme.Rekognition.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+<style name="Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+    <item name="colorControlNormal">?attr/colorOnPrimary</item>
+</style>
+
+<style name="Toolbar.TitleText" parent="TextAppearance.AppCompat.Title">
+    <item name="android:textSize">28sp</item>
+</style>
 </resources>
