@@ -26,6 +26,7 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Prompt the system to install text to speech if necessary
         requireSpeechEngineOrIgnore()
 
         model.speechEngine?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
@@ -37,6 +38,7 @@ class ResponseFragment : Fragment(R.layout.fragment_response) {
             override fun onError(utteranceId: String?) {}
         })
 
+        // Observe messages from the ViewModel meant to be displayed to the user
         model.messageToUser.observe(this) { outputMessageInFixedDuration(it) }
     }
 

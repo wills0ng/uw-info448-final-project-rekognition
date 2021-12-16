@@ -24,7 +24,7 @@ interface Annotator {
     fun getType(context: Context): String
     // Formats the annotation response into a string, if the response is valid
     fun onAnnotated(result: AnnotateImageResponse): String?
-    // Annotates an image with a description
+    // Annotates an image with a description, formatted in an AnnotateImageResponse
     suspend fun annotate(image: Bitmap): AnnotateImageResponse
 }
 
@@ -47,7 +47,7 @@ object FirebaseFunctionsService {
             }
 
             override suspend fun annotate(image: Bitmap) = requestAnnotation(
-                "annotateImage", TextRecognitionRequest.createRequest(image.toString64())
+                TextRecognitionRequest.createRequest(image.toString64())
             )
         },
         OBJECT {
@@ -62,18 +62,19 @@ object FirebaseFunctionsService {
             }
 
             override suspend fun annotate(image: Bitmap) = requestAnnotation(
-                "annotateImage", ObjectRecognitionRequest.createRequest(image.toString64())
+                ObjectRecognitionRequest.createRequest(image.toString64())
             )
         }
     }
 
-    private suspend fun requestAnnotation(endpoint: String, body: JsonObject): AnnotateImageResponse {
+    // Communicates with the Firebase image annotation API while being agnostic of the annotations requested
+    private suspend fun requestAnnotation(body: JsonObject): AnnotateImageResponse {
         if (!FirebaseAuthService.isAuthenticated()) {
             FirebaseAuthService.signIn()
         }
         val result = suspendCoroutine<JsonElement> { continuation ->
             functions
-                .getHttpsCallable(endpoint)
+                .getHttpsCallable("annotateImage")
                 .call(body.toString())
                 .addOnSuccessListener {
                     continuation.resume(JsonParser.parseString(Gson().toJson(it.data)))

@@ -15,6 +15,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Button to navigate to Camera fragment
         view.findViewById<Button>(R.id.button_main_to_camera).setOnClickListener {
             val intent = Intent(activity, AccessibilityActivity::class.java)
             startActivity(intent)
